@@ -1,79 +1,53 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { SidebarBrand } from "./sidebar-brand";
 import { SidebarNav } from "./sidebar-nav";
 import { SidebarUser } from "./sidebar-user";
 import { DocStatusWidget } from "./doc-status-widget";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
 import {
-  LayoutDashboard, FileCheck, FilePlus, Wand2,
-  Files, History, Mail, Edit, MonitorUp, Globe,
-  TrendingUp, Link as LinkIcon, Briefcase, User, Rss, PenSquare,
-  CalendarDays, Ticket, CalendarCheck
+  LayoutDashboard, FilePlus, Files, History, Mail, Edit,
+  Rss, PenSquare,
+  CalendarDays, Ticket, CalendarCheck, User,
 } from "lucide-react";
-import { CreatePost } from "@/components/feed/create-post";
-import { Post } from "@/apis/posts.api";
 
 export const navigation = [
   {
     title: "Dashboard",
     items: [
-      { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { name: "Feed", href: "/dashboard/feed", icon: Rss },
-      { name: "My Posts", href: "/dashboard/my-posts", icon: PenSquare },
+      { name: "Feed",      href: "/dashboard/feed",      icon: Rss },
+      { name: "My Posts",  href: "/dashboard/my-posts",  icon: PenSquare },
+      { name: "Overview",  href: "/dashboard/overview",    icon: LayoutDashboard },
     ]
   },
   {
     title: "Resumes",
     items: [
-      { name: "ATS Checker", href: "/dashboard/resumes/ats", icon: FileCheck },
-      { name: "Resume Builder", href: "/dashboard/resume-builder", icon: FilePlus },
-      { name: "Resume Enhancer", href: "/dashboard/resumes/enhancer", icon: Wand2 },
-      { name: "My Resumes", href: "/dashboard/resumes", icon: Files },
-      { name: "Resume Versions", href: "/dashboard/resumes/versions", icon: History },
+      { name: "Resume Builder",    href: "/dashboard/resume-builder", icon: FilePlus },
+      { name: "My Resumes",        href: "/dashboard/resumes",         icon: Files },
+      { name: "Resume Versions",   href: "/dashboard/resumes/versions", icon: History },
     ]
   },
   {
     title: "Cover Letters",
     items: [
-      { name: "My Cover Letters", href: "/dashboard/cover-letter/all", icon: Mail },
-      { name: "Cover Letter Builder", href: "/dashboard/cover-letter", icon: Edit },
-    ]
-  },
-  {
-    title: "Portfolio",
-    items: [
-      { name: "My Portfolios", href: "/dashboard/portfolio", icon: Globe },
-      { name: "Create Portfolio", href: "/dashboard/portfolio/create", icon: MonitorUp },
-    ]
-  },
-  {
-    title: "LinkedIn Tools",
-    items: [
-      { name: "Profile Enhancer", href: "/dashboard/linkedin/enhancer", icon: TrendingUp },
-    ]
-  },
-  {
-    title: "Connect Profiles",
-    items: [
-      { name: "Connect GitHub", href: "/dashboard/connect/github", icon: LinkIcon },
-      { name: "Connect LinkedIn", href: "/dashboard/connect/linkedin", icon: Briefcase },
+      { name: "My Cover Letters",       href: "/dashboard/cover-letter/all", icon: Mail },
+      { name: "Cover Letter Builder",   href: "/dashboard/cover-letter",     icon: Edit },
     ]
   },
   {
     title: "Events",
     items: [
-      { name: "All Events",        href: "/dashboard/events",                  icon: CalendarDays },
-      { name: "My Registrations",  href: "/dashboard/events/my-registrations", icon: Ticket },
-      { name: "My Events (Host)",  href: "/dashboard/events/my-events",        icon: CalendarCheck },
+      { name: "All Events",       href: "/dashboard/events",                  icon: CalendarDays },
+      { name: "My Registrations", href: "/dashboard/events/my-registrations", icon: Ticket },
+      { name: "My Events (Host)", href: "/dashboard/events/my-events",        icon: CalendarCheck },
     ]
   },
   {
-    title: "Settings",
+    title: "Account",
     items: [
-      { name: "Profile", href: "/dashboard/settings/profile", icon: User },
+      { name: "Profile", href: "/dashboard/profile", icon: User },
     ]
   }
 ];
@@ -85,12 +59,6 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
-  const [showCreatePost, setShowCreatePost] = useState(false);
-
-  const handlePostCreated = (_post: Post) => {
-    setShowCreatePost(false);
-  };
-
   return (
     <div className={cn(
       "flex h-full flex-col bg-white dark:bg-[#08080a] pb-4 shrink-0 transition-all duration-300 ease-in-out border-r border-black/5 dark:border-white/5 shadow-2xl",
@@ -102,27 +70,6 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
       {isOpen && (
         <>
           <SidebarBrand />
-
-          {/* Create Post Button */}
-          <div className="px-4 pb-3">
-            {!showCreatePost ? (
-              <button
-                onClick={() => setShowCreatePost(true)}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all shadow-md shadow-purple-500/20"
-              >
-                <Plus size={16} />
-                Create Post
-              </button>
-            ) : (
-              <div className="rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
-                <CreatePost
-                  onPostCreated={handlePostCreated}
-                  compact
-                  onCancel={() => setShowCreatePost(false)}
-                />
-              </div>
-            )}
-          </div>
 
           <SidebarNav navigation={navigation} onClose={onClose} />
 

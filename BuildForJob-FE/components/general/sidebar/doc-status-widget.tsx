@@ -10,25 +10,17 @@ const STATUS_CONFIG = {
     icon: FileClock,
     label: "Pending Review",
     sublabel: "Awaiting admin verification",
-    badge: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+    // Light: amber text on subtle amber bg; Dark: same as before
+    badge: "bg-amber-50 text-amber-700 border-amber-300 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/20",
     bar: "bg-amber-500",
     barWidth: "w-1/3",
     pulse: true,
-  },
-  VERIFIED: {
-    icon: FileCheck,
-    label: "Verified ✓",
-    sublabel: "All permissions unlocked",
-    badge: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
-    bar: "bg-emerald-500",
-    barWidth: "w-full",
-    pulse: false,
   },
   REJECTED: {
     icon: FileX,
     label: "Rejected",
     sublabel: "Action required — reupload",
-    badge: "bg-red-500/15 text-red-400 border-red-500/20",
+    badge: "bg-red-50 text-red-700 border-red-300 dark:bg-red-500/15 dark:text-red-400 dark:border-red-500/20",
     bar: "bg-red-500",
     barWidth: "w-1/3",
     pulse: false,
@@ -38,10 +30,12 @@ const STATUS_CONFIG = {
 export function DocStatusWidget() {
   const { docStatus, isFounder } = useDocStatus();
 
-  // Only show for founders
+  // Only show for founders, and hide entirely when VERIFIED (100% complete)
   if (!isFounder || !docStatus.status) return null;
+  if (docStatus.status === "VERIFIED") return null;
 
-  const cfg = STATUS_CONFIG[docStatus.status];
+  const cfg = STATUS_CONFIG[docStatus.status as keyof typeof STATUS_CONFIG];
+  if (!cfg) return null;
   const Icon = cfg.icon;
 
   return (
@@ -65,30 +59,28 @@ export function DocStatusWidget() {
       </div>
 
       {/* Progress bar */}
-      <div className="h-1 bg-black/20 rounded-full overflow-hidden mb-2">
+      <div className="h-1 bg-black/10 dark:bg-black/20 rounded-full overflow-hidden mb-2">
         <div className={cn("h-full rounded-full transition-all", cfg.bar, cfg.barWidth)} />
       </div>
 
-      <p className="text-xs opacity-60 mb-2">{cfg.sublabel}</p>
+      <p className="text-xs opacity-70 mb-2">{cfg.sublabel}</p>
 
       {/* Rejection reason */}
       {docStatus.status === "REJECTED" && docStatus.rejectionReason && (
-        <div className="text-xs opacity-80 bg-black/20 rounded-lg p-2 mb-2 leading-relaxed">
+        <div className="text-xs opacity-80 bg-black/10 dark:bg-black/20 rounded-lg p-2 mb-2 leading-relaxed">
           <span className="font-semibold">Reason: </span>
           {docStatus.rejectionReason}
         </div>
       )}
 
       {/* CTA */}
-      {docStatus.status !== "VERIFIED" && (
-        <Link
-          href="/dashboard/settings/profile#company"
-          className="flex items-center justify-between w-full text-xs font-semibold opacity-80 hover:opacity-100 transition-opacity"
-        >
-          {docStatus.status === "REJECTED" ? "Reupload Document" : "View Details"}
-          <ChevronRight size={12} />
-        </Link>
-      )}
+      <Link
+        href="/dashboard/settings/profile#company"
+        className="flex items-center justify-between w-full text-xs font-semibold opacity-80 hover:opacity-100 transition-opacity"
+      >
+        {docStatus.status === "REJECTED" ? "Reupload Document" : "View Details"}
+        <ChevronRight size={12} />
+      </Link>
     </div>
   );
 }

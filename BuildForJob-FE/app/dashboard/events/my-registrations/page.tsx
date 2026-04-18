@@ -36,7 +36,7 @@ export default function MyRegistrationsPage() {
   const past = regs.filter((r) => new Date(r.event.eventDate) < new Date());
 
   const renderReg = (reg: EventRegistration) => (
-    <div key={reg.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 space-y-4">
+    <div key={reg.id} className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-5 space-y-4">
       {/* Event info */}
       <div className="flex items-start gap-3">
         {reg.event.bannerUrl
@@ -44,7 +44,7 @@ export default function MyRegistrationsPage() {
           : <div className="w-14 h-14 rounded-xl bg-purple-500/15 flex items-center justify-center shrink-0"><CalendarDays size={22} className="text-purple-400" /></div>
         }
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-white text-sm leading-snug">{reg.event.title}</p>
+          <p className="font-bold text-gray-900 dark:text-white text-sm leading-snug">{reg.event.title}</p>
           <p className="text-xs text-gray-500 mt-0.5">{reg.event.organizerName}</p>
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
             <span className="flex items-center gap-1"><CalendarDays size={11} />{formatDate(reg.event.eventDate)}</span>
@@ -95,7 +95,7 @@ export default function MyRegistrationsPage() {
       {/* Amount paid */}
       <div className="flex items-center justify-between text-xs text-gray-500 pt-1 border-t border-white/5">
         <span>Registered {new Date(reg.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
-        <span className="flex items-center gap-1 text-white font-semibold">
+        <span className="flex items-center gap-1 text-gray-900 dark:text-white font-semibold">
           <IndianRupee size={12} />
           {reg.amountPaid === 0 ? "Free" : (reg.amountPaid / 100).toFixed(0)}
         </span>
@@ -106,18 +106,18 @@ export default function MyRegistrationsPage() {
   return (
     <div className="max-w-2xl mx-auto pb-16 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Ticket size={22} className="text-purple-400" /> My Registrations
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <Ticket size={22} className="text-purple-500" /> My Registrations
         </h1>
-        <p className="text-sm text-gray-500 mt-1">Events you've registered for</p>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Events you've registered for</p>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : regs.length === 0 ? (
         <div className="text-center py-24">
-          <Ticket size={40} className="text-gray-700 mx-auto mb-3" />
-          <p className="text-gray-500">No registrations yet. Browse events and join one!</p>
+          <Ticket size={40} className="text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-gray-500">No registrations yet. Browse events and join one!</p>
           <a href="/dashboard/events" className="mt-4 inline-block px-5 py-2 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:opacity-90 transition">
             Browse Events →
           </a>
@@ -126,13 +126,13 @@ export default function MyRegistrationsPage() {
         <>
           {upcoming.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Upcoming</h2>
+              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Upcoming</h2>
               {upcoming.map(renderReg)}
             </section>
           )}
           {past.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Past</h2>
+              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Past</h2>
               <div className="opacity-70">{past.map(renderReg)}</div>
             </section>
           )}

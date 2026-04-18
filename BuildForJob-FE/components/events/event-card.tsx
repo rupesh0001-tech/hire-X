@@ -27,15 +27,15 @@ export function EventCard({ event, onRegister, past }: EventCardProps) {
 
   return (
     <div className={cn(
-      "rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden hover:border-white/20 transition-all group",
+      "rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] overflow-hidden hover:border-purple-300 dark:hover:border-white/20 transition-all group shadow-sm hover:shadow-md",
       event.status === "CANCELLED" && "opacity-60"
     )}>
       {/* Banner */}
       {event.bannerUrl ? (
         <img src={event.bannerUrl} alt="" className="w-full h-36 object-cover" />
       ) : (
-        <div className="w-full h-24 bg-gradient-to-br from-purple-500/20 to-violet-600/10 flex items-center justify-center">
-          <CalendarDays size={32} className="text-purple-400/50" />
+        <div className="w-full h-24 bg-gradient-to-br from-purple-100 dark:from-purple-500/20 to-violet-100 dark:to-violet-600/10 flex items-center justify-center">
+          <CalendarDays size={32} className="text-purple-400 dark:text-purple-400/50" />
         </div>
       )}
 
@@ -58,24 +58,24 @@ export function EventCard({ event, onRegister, past }: EventCardProps) {
           )}
         </div>
 
-        <h3 className="font-bold text-white text-base leading-snug line-clamp-2">{event.title}</h3>
-        <p className="text-xs text-gray-500 line-clamp-2">{event.description}</p>
+        <h3 className="font-bold text-gray-900 dark:text-white text-base leading-snug line-clamp-2">{event.title}</h3>
+        <p className="text-xs text-gray-500 dark:text-gray-500 line-clamp-2">{event.description}</p>
 
-        <div className="grid grid-cols-2 gap-2 text-xs text-gray-400">
+        <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-1.5">
-            <CalendarDays size={12} className="text-purple-400 shrink-0" />
+            <CalendarDays size={12} className="text-purple-500 dark:text-purple-400 shrink-0" />
             <span>{formatDate(event.eventDate)}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <MapPin size={12} className="text-purple-400 shrink-0" />
+            <MapPin size={12} className="text-purple-500 dark:text-purple-400 shrink-0" />
             <span className="truncate">{event.venue}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <IndianRupee size={12} className="text-purple-400 shrink-0" />
-            <span className="font-semibold text-white">{formatPrice(event.price)}</span>
+            <IndianRupee size={12} className="text-purple-500 dark:text-purple-400 shrink-0" />
+            <span className="font-semibold text-gray-900 dark:text-white">{formatPrice(event.price)}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Users size={12} className="text-purple-400 shrink-0" />
+            <Users size={12} className="text-purple-500 dark:text-purple-400 shrink-0" />
             <span>
               {event._count.registrations}{event.maxParticipants ? `/${event.maxParticipants}` : ""} registered
             </span>
@@ -83,16 +83,16 @@ export function EventCard({ event, onRegister, past }: EventCardProps) {
         </div>
 
         {event.prize && (
-          <div className="flex items-center gap-1.5 text-xs text-amber-400">
+          <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400">
             <Trophy size={12} /> <span>{event.prize}</span>
           </div>
         )}
 
-        <div className="flex items-center gap-2 pt-1 border-t border-white/5">
+        <div className="flex items-center gap-2 pt-1 border-t border-gray-100 dark:border-white/5">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
             {event.organizer.firstName[0]}
           </div>
-          <span className="text-xs text-gray-500 flex-1 truncate">{event.organizerName}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-500 flex-1 truncate">{event.organizerName}</span>
 
           {!isOwn && !past && event.status !== "CANCELLED" && !event.isRegistered && !isFull && (
             <button
@@ -103,7 +103,7 @@ export function EventCard({ event, onRegister, past }: EventCardProps) {
             </button>
           )}
           {event.isRegistered && (
-            <span className="ml-auto text-xs text-emerald-400 font-semibold flex items-center gap-1">
+            <span className="ml-auto text-xs text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
               <TicketCheck size={12} /> Registered
             </span>
           )}

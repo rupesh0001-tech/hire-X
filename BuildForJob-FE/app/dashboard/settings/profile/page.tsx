@@ -228,7 +228,7 @@ export default function ProfileSettingsPage() {
     <div className="max-w-4xl mx-auto pb-20 space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-black dark:text-white tracking-tight">Profile Builder</h1>
+          <h1 className="text-3xl font-bold text-black dark:text-white tracking-tight">Profile</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">Enhance your profile to generate professional resumes instantly.</p>
         </div>
         <div className="flex items-center gap-4 bg-white dark:bg-[#111116] border border-gray-200 dark:border-white/10 px-5 py-3 rounded-2xl shadow-sm">

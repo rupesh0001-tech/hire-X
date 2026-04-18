@@ -39,10 +39,10 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <CalendarDays size={22} className="text-purple-400" /> Events
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <CalendarDays size={22} className="text-purple-500" /> Events
           </h1>
-          <p className="text-sm text-gray-500 mt-1">Discover and join events by the community</p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Discover and join events by the community</p>
         </div>
         <button
           onClick={() => setShowCreate(true)}
@@ -54,13 +54,13 @@ export default function EventsPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+        <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="Search events, venues, organizers…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition"
+          className="w-full pl-10 pr-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500/40 transition"
         />
       </div>
 
@@ -72,8 +72,8 @@ export default function EventsPage() {
         <>
           {upcoming.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <Clock size={14} className="text-purple-400" /> Upcoming
+              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <Clock size={14} className="text-purple-500 dark:text-purple-400" /> Upcoming
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {upcoming.map((e) => (
@@ -85,8 +85,8 @@ export default function EventsPage() {
 
           {past.length > 0 && (
             <section className="space-y-4">
-              <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                <TicketCheck size={14} className="text-gray-500" /> Past Events
+              <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                <TicketCheck size={14} className="text-gray-400 dark:text-gray-500" /> Past Events
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-70">
                 {past.map((e) => (
@@ -98,8 +98,8 @@ export default function EventsPage() {
 
           {filtered.length === 0 && (
             <div className="text-center py-24">
-              <CalendarDays size={40} className="text-gray-700 mx-auto mb-3" />
-              <p className="text-gray-500">No events found. Be the first to host one!</p>
+              <CalendarDays size={40} className="text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-500">No events found. Be the first to host one!</p>
               <button onClick={() => setShowCreate(true)}
                 className="mt-4 px-5 py-2 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:opacity-90 transition">
                 Host an Event

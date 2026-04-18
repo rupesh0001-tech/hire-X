@@ -260,7 +260,7 @@ export default function MyPostsPage() {
                     : "bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/10"
                 }`}
               >
-                {f === "sponsored" ? "⚡ Sponsored" : f === "image" ? "🖼️ Image" : f === "text" ? "📄 Text" : "All"}
+                {f === "sponsored" ? "Sponsored" : f === "image" ? "Image" : f === "text" ? "Text" : "All"}
               </button>
             ))}
           </div>

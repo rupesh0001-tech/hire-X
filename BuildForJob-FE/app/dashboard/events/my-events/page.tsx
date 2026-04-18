@@ -37,15 +37,15 @@ function AttendanceVerifier({ eventId }: { eventId: string }) {
   };
 
   return (
-    <div className="rounded-xl border border-purple-500/20 bg-purple-500/[0.06] p-4 space-y-3">
-      <p className="text-sm font-semibold text-purple-300 flex items-center gap-2"><ScanLine size={15} /> Verify Attendee at Venue</p>
+    <div className="rounded-xl border border-purple-300 dark:border-purple-500/20 bg-purple-50 dark:bg-purple-500/[0.06] p-4 space-y-3">
+      <p className="text-sm font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-2"><ScanLine size={15} /> Verify Attendee at Venue</p>
       <div className="flex gap-2">
         <input
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 5))}
           placeholder="Enter 5-digit code"
           maxLength={5}
-          className="flex-1 px-4 py-2.5 bg-[#111116] border border-white/10 rounded-xl text-lg font-mono font-bold text-white tracking-widest uppercase placeholder:text-gray-700 placeholder:text-sm placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition"
+          className="flex-1 px-4 py-2.5 bg-white dark:bg-[#111116] border border-gray-200 dark:border-white/10 rounded-xl text-lg font-mono font-bold text-gray-900 dark:text-white tracking-widest uppercase placeholder:text-gray-400 dark:placeholder:text-gray-700 placeholder:text-sm placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition"
         />
         <button onClick={verify} disabled={loading || code.length < 5}
           className="px-4 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center gap-2">
@@ -54,7 +54,7 @@ function AttendanceVerifier({ eventId }: { eventId: string }) {
       </div>
       {result && (
         <div className={cn("flex items-center gap-2 p-3 rounded-xl text-sm font-semibold",
-          result.already ? "bg-amber-500/10 border border-amber-500/20 text-amber-300" : "bg-emerald-500/10 border border-emerald-500/20 text-emerald-300")}>
+          result.already ? "bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-700 dark:text-amber-300" : "bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300")}>
           <CheckCircle size={15} />
           {result.already ? `Already verified: ${result.name}` : `✓ Verified! Welcome, ${result.name}`}
         </div>
@@ -102,7 +102,7 @@ function HostedEventCard({ event, onRefresh }: { event: Event; onRefresh: () => 
 
   return (
     <div className={cn("rounded-2xl border overflow-hidden transition-all",
-      event.status === "CANCELLED" ? "border-red-500/20 bg-red-500/[0.03]" : "border-white/10 bg-white/[0.02] hover:border-white/20")}>
+      event.status === "CANCELLED" ? "border-red-200 dark:border-red-500/20 bg-red-50/30 dark:bg-red-500/[0.03]" : "border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.02] hover:border-purple-300 dark:hover:border-white/20")}>
       {/* Header */}
       <div className="p-5">
         <div className="flex items-start gap-4">
@@ -112,7 +112,7 @@ function HostedEventCard({ event, onRefresh }: { event: Event; onRefresh: () => 
           }
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <h3 className="font-bold text-white">{event.title}</h3>
+              <h3 className="font-bold text-gray-900 dark:text-white">{event.title}</h3>
               <span className={cn("text-xs px-2 py-0.5 rounded-full font-semibold border",
                 event.status === "ACTIVE" ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/20" :
                 event.status === "CANCELLED" ? "bg-red-500/15 text-red-400 border-red-500/20" :
@@ -146,7 +146,7 @@ function HostedEventCard({ event, onRefresh }: { event: Event; onRefresh: () => 
 
       {/* Expanded panel */}
       {expanded && (
-        <div className="border-t border-white/5 p-5 space-y-5">
+        <div className="border-t border-gray-100 dark:border-white/5 p-5 space-y-5">
           {/* Attendance verifier (only for active, non-past events) */}
           {event.status === "ACTIVE" && !isPast && (
             <AttendanceVerifier eventId={event.id} />
@@ -172,8 +172,8 @@ function HostedEventCard({ event, onRefresh }: { event: Event; onRefresh: () => 
               </div>
 
               {/* Revenue */}
-              <div className="rounded-xl border border-white/10 p-4 bg-white/[0.02] space-y-2">
-                <p className="text-sm font-semibold text-white">Revenue Summary</p>
+              <div className="rounded-xl border border-gray-200 dark:border-white/10 p-4 bg-gray-50 dark:bg-white/[0.02] space-y-2">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Revenue Summary</p>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Earned (attended users)</span>
                   <span className="text-emerald-400 font-bold">{formatRupees(stats.totalRevenue)}</span>
@@ -189,10 +189,10 @@ function HostedEventCard({ event, onRefresh }: { event: Event; onRefresh: () => 
               {regs.registrations.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Registrant List</p>
-                  <div className="rounded-xl border border-white/10 overflow-hidden">
+                   <div className="rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-white/5 bg-white/[0.02]">
+                        <tr className="border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/[0.02]">
                           <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium">Name</th>
                           <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium hidden md:table-cell">Email</th>
                           <th className="text-left px-4 py-2.5 text-xs text-gray-500 font-medium">Status</th>
@@ -265,18 +265,18 @@ export default function MyEventsPage() {
   return (
     <div className="max-w-3xl mx-auto pb-16 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-          <CalendarCheck size={22} className="text-purple-400" /> My Events
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <CalendarCheck size={22} className="text-purple-500" /> My Events
         </h1>
-        <p className="text-sm text-gray-500 mt-1">Events you're hosting — manage, verify attendance, view analytics</p>
+        <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Events you're hosting — manage, verify attendance, view analytics</p>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20"><div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : events.length === 0 ? (
         <div className="text-center py-24">
-          <CalendarCheck size={40} className="text-gray-700 mx-auto mb-3" />
-          <p className="text-gray-500">You haven't hosted any events yet.</p>
+          <CalendarCheck size={40} className="text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+          <p className="text-gray-500 dark:text-gray-500">You haven't hosted any events yet.</p>
           <a href="/dashboard/events" className="mt-4 inline-block px-5 py-2 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:opacity-90 transition">
             Host an Event →
           </a>
