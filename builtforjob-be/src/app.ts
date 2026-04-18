@@ -5,6 +5,7 @@ import { otpRouter } from './routes/otp/otp.routes';
 import { faceRouter } from './routes/face/face.routes';
 import { companyRouter } from './routes/company/company.routes';
 import { postRouter } from './routes/post/post.routes';
+import { paymentRouter } from './routes/payment/payment.routes';
 import { errorMiddleware } from './middlewares/error/error.middleware';
 
 const app = express();
@@ -23,6 +24,7 @@ app.use('/verify', otpRouter);
 app.use('/face', faceRouter);
 app.use('/company', companyRouter);
 app.use('/post', postRouter);
+app.use('/payment', paymentRouter);
 
 // Root
 app.get('/', (req, res) => {

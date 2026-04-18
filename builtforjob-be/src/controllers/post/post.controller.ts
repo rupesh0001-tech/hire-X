@@ -60,7 +60,7 @@ export class PostController {
     }
   }
 
-  // GET /post/feed — Get all posts for the feed (newest first)
+  // GET /post/feed — Get all posts for the feed (newest first, sponsored pinned)
   static async getFeed(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.userId;
@@ -105,17 +105,29 @@ export class PostController {
         },
       });
 
+      const now = new Date();
+
       // Annotate whether current user liked each post
       const enriched = posts.map((p) => ({
         ...p,
         isLikedByMe: p.likes.some((l) => l.userId === userId),
+        // Expire sponsorship if the window has passed
+        isSponsored: p.isSponsored && p.promotedUntil != null && p.promotedUntil > now,
       }));
+
+      // Sort: active sponsored posts first, then by createdAt desc
+      enriched.sort((a, b) => {
+        if (a.isSponsored && !b.isSponsored) return -1;
+        if (!a.isSponsored && b.isSponsored) return 1;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
 
       return res.json({ success: true, data: enriched });
     } catch (error) {
       next(error);
     }
   }
+
 
   // DELETE /post/:id — Delete a post (author only)
   static async deletePost(req: AuthRequest, res: Response, next: NextFunction) {

@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Heart, MessageCircle, Trash2, Send, ChevronDown,
-  ChevronUp, Crown, Loader2,
+  Heart, MessageCircle, Trash2, Send,
+  ChevronDown, ChevronUp, Crown, Loader2, Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useAppSelector } from "@/store/hooks";
 import { postsApi, Post, Comment } from "@/apis/posts.api";
+import { PromoteModal } from "@/components/feed/promote-modal";
 import { formatDistanceToNow } from "date-fns";
 
 interface PostCardProps {
@@ -50,6 +51,8 @@ export function PostCard({
   const [commentText, setCommentText] = useState("");
   const [addingComment, setAddingComment] = useState(false);
   const [deletingPost, setDeletingPost] = useState(false);
+  const [showPromoteModal, setShowPromoteModal] = useState(false);
+  const [isSponsored, setIsSponsored] = useState(post.isSponsored);
 
   const handleLike = async () => {
     if (liking) return;
@@ -108,6 +111,7 @@ export function PostCard({
   const timeAgo = formatDistanceToNow(new Date(post.createdAt), { addSuffix: true });
 
   return (
+    <>
     <motion.div
       layout
       initial={{ opacity: 0, y: 16 }}
@@ -130,6 +134,12 @@ export function PostCard({
                   Founder
                 </span>
               )}
+              {isSponsored && (
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                  <Zap size={9} className="text-yellow-400" />
+                  Sponsored
+                </span>
+              )}
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-500">
               {post.author.jobTitle ?? post.author.company?.name ?? "Member"} · {timeAgo}
@@ -138,13 +148,25 @@ export function PostCard({
         </Link>
 
         {isOwner && (
-          <button
-            onClick={handleDeletePost}
-            disabled={deletingPost}
-            className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
-          >
-            {deletingPost ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
-          </button>
+          <div className="flex items-center gap-1">
+            {!isSponsored && (
+              <button
+                onClick={() => setShowPromoteModal(true)}
+                title="Smart Promote"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 transition-all"
+              >
+                <Zap size={12} className="text-yellow-500" />
+                Promote
+              </button>
+            )}
+            <button
+              onClick={handleDeletePost}
+              disabled={deletingPost}
+              className="p-2 rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+            >
+              {deletingPost ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
+            </button>
+          </div>
         )}
       </div>
 
@@ -167,15 +189,15 @@ export function PostCard({
       </div>
 
       {/* Stats row */}
-      {(likeCount > 0 || post.comments.length > 0) && (
+      {(likeCount > 0 || (post.comments ?? []).length > 0) && (
         <div className="px-5 pb-2 flex items-center gap-3 text-xs text-gray-400">
           {likeCount > 0 && <span>{likeCount} {likeCount === 1 ? "like" : "likes"}</span>}
-          {post.comments.length > 0 && (
+          {(post.comments ?? []).length > 0 && (
             <button
               onClick={() => setShowComments((v) => !v)}
               className="hover:text-purple-500 transition-colors"
             >
-              {post.comments.length} {post.comments.length === 1 ? "comment" : "comments"}
+              {(post.comments ?? []).length} {(post.comments ?? []).length === 1 ? "comment" : "comments"}
             </button>
           )}
         </div>
@@ -219,7 +241,7 @@ export function PostCard({
           >
             <div className="mx-5 mb-4 mt-1 space-y-3">
               {/* Existing comments */}
-              {post.comments.map((c) => (
+              {(post.comments ?? []).map((c) => (
                 <div key={c.id} className="flex items-start gap-2.5 group">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-[9px] shrink-0 overflow-hidden">
                     {c.author.avatarUrl ? (
@@ -290,5 +312,18 @@ export function PostCard({
         )}
       </AnimatePresence>
     </motion.div>
+
+    {/* Promote Modal */}
+    {showPromoteModal && (
+      <PromoteModal
+        post={post}
+        onClose={() => setShowPromoteModal(false)}
+        onPromoted={() => {
+          setIsSponsored(true);
+          setShowPromoteModal(false);
+        }}
+      />
+    )}
+    </>
   );
 }

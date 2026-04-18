@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Rss, RefreshCw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { postsApi, Post, Comment } from "@/apis/posts.api";
 import { CreatePost } from "@/components/feed/create-post";
 import { PostCard } from "@/components/feed/post-card";
@@ -10,11 +10,9 @@ export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
-  const loadFeed = useCallback(async (silent = false) => {
-    if (!silent) setLoading(true);
-    else setRefreshing(true);
+  const loadFeed = useCallback(async () => {
+    setLoading(true);
     setError(null);
     try {
       const res = await postsApi.getFeed();
@@ -23,7 +21,6 @@ export default function FeedPage() {
       setError(e.response?.data?.message || "Failed to load feed");
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, []);
 
@@ -31,7 +28,14 @@ export default function FeedPage() {
 
   // ── optimistic handlers ──────────────────────────────────────
   const handlePostCreated = (post: Post) => {
-    setPosts((prev) => [post, ...prev]);
+    // Normalize: ensure comments/counts are always defined
+    const normalizedPost: Post = {
+      ...post,
+      comments: post.comments ?? [],
+      _count: post._count ?? { likes: 0, comments: 0 },
+      isLikedByMe: post.isLikedByMe ?? false,
+    };
+    setPosts((prev) => [normalizedPost, ...prev]);
   };
 
   const handleDelete = (postId: string) => {
@@ -54,8 +58,8 @@ export default function FeedPage() {
         p.id === postId
           ? {
               ...p,
-              comments: [...p.comments, comment],
-              _count: { ...p._count, comments: p._count.comments + 1 },
+              comments: [...(p.comments ?? []), comment],
+              _count: { ...p._count, comments: (p._count?.comments ?? 0) + 1 },
             }
           : p
       )
@@ -68,8 +72,8 @@ export default function FeedPage() {
         p.id === postId
           ? {
               ...p,
-              comments: p.comments.filter((c) => c.id !== commentId),
-              _count: { ...p._count, comments: p._count.comments - 1 },
+              comments: (p.comments ?? []).filter((c) => c.id !== commentId),
+              _count: { ...p._count, comments: Math.max(0, (p._count?.comments ?? 1) - 1) },
             }
           : p
       )
@@ -78,29 +82,6 @@ export default function FeedPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-16 animation-fade-in">
-      {/* Page header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <Rss size={20} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Feed</h1>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {posts.length > 0 ? `${posts.length} posts` : "What's happening"}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => loadFeed(true)}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 border border-gray-200 dark:border-white/10 transition-all"
-        >
-          <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
-          <span className="hidden sm:inline">Refresh</span>
-        </button>
-      </div>
-
       {/* Create post */}
       <div className="mb-6">
         <CreatePost onPostCreated={handlePostCreated} />
@@ -125,7 +106,7 @@ export default function FeedPage() {
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3 text-center">
           <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-400 mb-2">
-            <Rss size={28} />
+            <span className="text-3xl">📭</span>
           </div>
           <p className="text-base font-semibold text-gray-700 dark:text-gray-300">No posts yet</p>
           <p className="text-sm text-gray-400">Be the first to share something with the community!</p>

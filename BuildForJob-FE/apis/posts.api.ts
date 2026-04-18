@@ -30,6 +30,8 @@ export interface Post {
   likes: { userId: string }[];
   comments: Comment[];
   isLikedByMe: boolean;
+  isSponsored: boolean;
+  promotedUntil?: string | null;
   _count: { likes: number; comments: number };
   createdAt: string;
   updatedAt: string;
@@ -41,6 +43,12 @@ export const postsApi = {
     const res = await api.get<{ success: boolean; data: Post[] }>(
       `/post/feed?page=${page}&limit=${limit}`
     );
+    return res.data;
+  },
+
+  /** Fetch posts by the current logged-in user */
+  getMyPosts: async (userId: string) => {
+    const res = await api.get<{ success: boolean; data: Post[] }>(`/post/user/${userId}`);
     return res.data;
   },
 
@@ -86,6 +94,30 @@ export const postsApi = {
   /** Get posts by a specific user */
   getUserPosts: async (userId: string) => {
     const res = await api.get<{ success: boolean; data: Post[] }>(`/post/user/${userId}`);
+    return res.data;
+  },
+
+  /** Create a Razorpay order for post promotion */
+  createPromotionOrder: async (postId: string) => {
+    const res = await api.post<{
+      success: boolean;
+      data: { orderId: string; amount: number; currency: string; keyId: string };
+    }>('/payment/promote/order', { postId });
+    return res.data;
+  },
+
+  /** Verify Razorpay payment and activate promotion */
+  verifyPromotion: async (payload: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+    postId: string;
+  }) => {
+    const res = await api.post<{
+      success: boolean;
+      message: string;
+      data: { postId: string; promotedUntil: string };
+    }>('/payment/promote/verify', payload);
     return res.data;
   },
 };
