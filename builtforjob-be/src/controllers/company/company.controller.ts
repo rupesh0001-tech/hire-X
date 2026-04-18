@@ -57,6 +57,8 @@ export class CompanyController {
         docFileId = uploaded.fileId;
       }
 
+      const docStatusReset = docFile ? { docVerificationStatus: 'PENDING' as const, docRejectionReason: null } : {};
+
       const company = await prisma.company.upsert({
         where: { userId },
         create: {
@@ -79,6 +81,7 @@ export class CompanyController {
           logoFileId,
           docUrl,
           docFileId,
+          ...docStatusReset,
         },
       });
 

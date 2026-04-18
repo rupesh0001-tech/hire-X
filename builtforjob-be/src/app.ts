@@ -6,6 +6,7 @@ import { faceRouter } from './routes/face/face.routes';
 import { companyRouter } from './routes/company/company.routes';
 import { postRouter } from './routes/post/post.routes';
 import { paymentRouter } from './routes/payment/payment.routes';
+import { adminRouter } from './routes/admin/admin.routes';
 import { errorMiddleware } from './middlewares/error/error.middleware';
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/face', faceRouter);
 app.use('/company', companyRouter);
 app.use('/post', postRouter);
 app.use('/payment', paymentRouter);
+app.use('/admin', adminRouter);
 
 // Root
 app.get('/', (req, res) => {

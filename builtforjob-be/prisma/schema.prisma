@@ -186,22 +186,42 @@ enum UserRole {
   FOUNDER
 }
 
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
 model Company {
-  id          String   @id @default(uuid())
-  name        String
-  description String?  @db.Text
-  website     String?
-  industry    String?
-  logoUrl     String?  // ImageKit URL
-  logoFileId  String?  // ImageKit file ID for deletion
-  docUrl      String?  // Owner documentation ImageKit URL
-  docFileId   String?  // ImageKit file ID
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                   String                @id @default(uuid())
+  name                 String
+  description          String?               @db.Text
+  website              String?
+  industry             String?
+  logoUrl              String?               // ImageKit URL
+  logoFileId           String?               // ImageKit file ID for deletion
+  docUrl               String?               // Owner documentation ImageKit URL
+  docFileId            String?               // ImageKit file ID
+  docVerificationStatus DocVerificationStatus @default(PENDING)
+  docRejectionReason   String?               @db.Text
+  userId               String                @unique
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 
   @@map("companies")
+}
+
+enum DocVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
 }
 
 // Social Feed

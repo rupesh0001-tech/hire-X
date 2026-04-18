@@ -323,6 +323,20 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash(PASSWORD, 10);
 
+  // ── 0. Seed admin account ──────────────────────────────────────────────────
+  console.log("🔐 Creating admin account...");
+  await prisma.admin.upsert({
+    where: { email: "admin@gmail.com" },
+    update: {},
+    create: {
+      email: "admin@gmail.com",
+      password: hashedPassword,
+      firstName: "Super",
+      lastName: "Admin",
+    },
+  });
+  console.log("  ✅ admin@gmail.com (password: Test@123)");
+
   // ── 1. Upsert regular users ──────────────────────────────────────────────
   console.log("👤 Creating 10 regular users...");
   const createdUsers = [];
