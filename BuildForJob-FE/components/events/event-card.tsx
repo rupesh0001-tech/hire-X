@@ -21,7 +21,7 @@ interface EventCardProps {
 
 export function EventCard({ event, onRegister, past }: EventCardProps) {
   const { user } = useAppSelector((s) => s.auth);
-  const isOwn = event.organizerId === user?.id;
+  const isOwn = !!(user?.id && event.organizerId === user.id);
   const isFull = event.maxParticipants ? event._count.registrations >= event.maxParticipants : false;
   const isPast = new Date(event.eventDate) < new Date();
 
@@ -94,10 +94,10 @@ export function EventCard({ event, onRegister, past }: EventCardProps) {
           </div>
           <span className="text-xs text-gray-500 flex-1 truncate">{event.organizerName}</span>
 
-          {!isOwn && !past && event.status === "ACTIVE" && !event.isRegistered && !isFull && (
+          {!isOwn && !past && event.status !== "CANCELLED" && !event.isRegistered && !isFull && (
             <button
               onClick={onRegister}
-              className="ml-auto text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 transition-colors"
+              className="ml-auto text-xs font-semibold px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 active:scale-[0.97] transition-all shadow shadow-purple-500/30"
             >
               Register →
             </button>

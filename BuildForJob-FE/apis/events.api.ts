@@ -89,9 +89,9 @@ export const eventsApi = {
   createEvent: (formData: FormData) =>
     api.post<{ success: boolean; data: Event }>('/event', formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data),
 
-  /** Step 1 for attending: get entry fee order */
-  createRegistrationOrder: (eventId: string) =>
-    api.post<{ success: boolean; data: { orderId: string; amount: number; currency: string; keyId: string } }>(`/event/${eventId}/register/order`).then((r) => r.data),
+  /** Step 1 for attending: get entry fee order (also carries participant info for free events) */
+  createRegistrationOrder: (eventId: string, participantData: { participantName: string; participantEmail: string; participantPhone: string }) =>
+    api.post<{ success: boolean; data: { orderId: string; amount: number; currency: string; keyId: string; free?: boolean; attendanceCode?: string; registrationId?: string } }>(`/event/${eventId}/register/order`, participantData).then((r) => r.data),
 
   /** Step 2: verify entry payment & get attendance code */
   verifyRegistration: (eventId: string, payload: {

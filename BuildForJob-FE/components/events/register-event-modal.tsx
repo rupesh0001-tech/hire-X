@@ -48,7 +48,7 @@ export function RegisterEventModal({ event, onClose, onSuccess }: Props) {
     }
     setLoading(true);
     try {
-      const orderRes = await eventsApi.createRegistrationOrder(event.id);
+      const orderRes = await eventsApi.createRegistrationOrder(event.id, form);
       if (!orderRes.success) throw new Error("Failed to create order");
 
       // free event — code comes back directly
