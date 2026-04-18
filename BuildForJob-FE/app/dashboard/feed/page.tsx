@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { postsApi, Post, Comment } from "@/apis/posts.api";
 import { CreatePost } from "@/components/feed/create-post";
 import { PostCard } from "@/components/feed/post-card";
+import { DocVerificationBanner } from "@/components/feed/doc-verification-banner";
 
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -82,6 +83,9 @@ export default function FeedPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-16 animation-fade-in">
+      {/* Doc verification banner — only shows for unverified founders */}
+      <DocVerificationBanner />
+
       {/* Create post */}
       <div className="mb-6">
         <CreatePost onPostCreated={handlePostCreated} />

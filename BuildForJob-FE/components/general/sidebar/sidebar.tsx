@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { SidebarBrand } from "./sidebar-brand";
 import { SidebarNav } from "./sidebar-nav";
 import { SidebarUser } from "./sidebar-user";
+import { DocStatusWidget } from "./doc-status-widget";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import {
@@ -115,6 +116,8 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
           </div>
 
           <SidebarNav navigation={navigation} onClose={onClose} />
+
+          <DocStatusWidget />
 
           <SidebarUser />
         </>
