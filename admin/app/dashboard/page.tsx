@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { api, AdminStats } from "@/lib/api";
 import {
   Users, Building2, Newspaper, FileClock, FileCheck, FileX,
-  AlertTriangle, TrendingUp,
+  AlertTriangle, TrendingUp, CalendarDays, RefreshCcw,
 } from "lucide-react";
 
 function cn(...cls: (string | boolean | undefined)[]) {
@@ -77,20 +77,23 @@ export default function DashboardPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <StatCard label="Regular Users"  value={stats?.totalUsers    ?? 0} Icon={Users}      color="purple" />
-        <StatCard label="Founders"       value={stats?.totalFounders ?? 0} Icon={Building2}  color="blue"   />
-        <StatCard label="Total Posts"    value={stats?.totalPosts    ?? 0} Icon={Newspaper}  color="violet" />
-        <StatCard label="Pending Docs"   value={stats?.pendingDocs   ?? 0} Icon={FileClock}  color="amber"  />
-        <StatCard label="Verified Docs"  value={stats?.verifiedDocs  ?? 0} Icon={FileCheck}  color="green"  />
-        <StatCard label="Rejected Docs"  value={stats?.rejectedDocs  ?? 0} Icon={FileX}      color="red"    />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="Regular Users"  value={stats?.totalUsers    ?? 0} Icon={Users}       color="purple" />
+        <StatCard label="Founders"       value={stats?.totalFounders ?? 0} Icon={Building2}   color="blue"   />
+        <StatCard label="Total Posts"    value={stats?.totalPosts    ?? 0} Icon={Newspaper}   color="violet" />
+        <StatCard label="Events Listed"  value={stats?.totalEvents   ?? 0} Icon={CalendarDays} color="blue"  />
+        <StatCard label="Pending Docs"   value={stats?.pendingDocs   ?? 0} Icon={FileClock}   color="amber"  />
+        <StatCard label="Verified Docs"  value={stats?.verifiedDocs  ?? 0} Icon={FileCheck}   color="green"  />
+        <StatCard label="Rejected Docs"  value={stats?.rejectedDocs  ?? 0} Icon={FileX}       color="red"    />
+        <StatCard label="Pending Refunds" value={stats?.pendingRefunds ?? 0} Icon={RefreshCcw} color="amber" />
       </div>
 
       {/* Quick links */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {[
-          { href: "/dashboard/docs",  Icon: FileCheck, title: "Verify Documents",  sub: "Review founder ownership docs",  accent: "purple" },
-          { href: "/dashboard/users", Icon: Users,     title: "Manage Users",      sub: "Browse all registered accounts", accent: "blue"   },
+          { href: "/dashboard/docs",   Icon: FileCheck,    title: "Verify Documents", sub: "Review founder ownership docs",  accent: "purple" },
+          { href: "/dashboard/users",  Icon: Users,        title: "Manage Users",     sub: "Browse all registered accounts", accent: "blue"   },
+          { href: "/dashboard/events", Icon: CalendarDays, title: "Events",           sub: "View and manage platform events", accent: "violet" },
         ].map(({ href, Icon, title, sub, accent }) => (
           <a key={href} href={href}
             className="group p-5 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all">

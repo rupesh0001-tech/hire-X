@@ -14,4 +14,9 @@ router.get('/stats', authenticateAdmin, AdminController.getStats as any);
 router.patch('/docs/:companyId/verify', authenticateAdmin, AdminController.verifyDoc as any);
 router.patch('/docs/:companyId/reject', authenticateAdmin, AdminController.rejectDoc as any);
 
+// Events
+router.get('/events', authenticateAdmin, AdminController.getAllEvents as any);
+router.get('/events/:id/registrations', authenticateAdmin, AdminController.getEventRegistrations as any);
+router.post('/events/:id/cancel', authenticateAdmin, AdminController.cancelEvent as any);
+
 export { router as adminRouter };

@@ -49,6 +49,10 @@ model User {
   likes        Like[]
   comments     Comment[]
 
+  // Events
+  events                Event[]
+  eventRegistrations    EventRegistration[]
+
   @@map("users")
 }
 
@@ -274,4 +278,99 @@ model Comment {
 enum PostType {
   TEXT
   IMAGE
+}
+
+// ─── Events ───────────────────────────────────────────────────────────────────
+
+model Event {
+  id                  String        @id @default(uuid())
+  title               String
+  description         String        @db.Text
+  bannerUrl           String?
+  bannerFileId        String?
+  price               Int           // in paise (INR). 0 = free
+  venue               String
+  prize               String?
+  maxParticipants     Int?
+  eventDate           DateTime
+  contactInfo         String
+  organizerName       String
+  status              EventStatus   @default(ACTIVE)
+  
+  // Listing fee payment (₹100)
+  listingOrderId      String?
+  listingPaymentId    String?
+  isListed            Boolean       @default(false)  // true once listing fee paid
+
+  organizerId         String
+  organizer           User          @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  registrations       EventRegistration[]
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([organizerId])
+  @@map("events")
+}
+
+model EventRegistration {
+  id              String                    @id @default(uuid())
+  eventId         String
+  event           Event                     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Participant details (captured at registration)
+  participantName  String
+  participantEmail String
+  participantPhone String
+
+  // Payment
+  amountPaid       Int                       // in paise
+  orderId          String?
+  paymentId        String?
+  paymentStatus    PaymentStatus             @default(PENDING)
+
+  // Secret 5-digit attendance code — never exposed to host/admin
+  attendanceCode   String
+
+  // Attendance verification
+  attendanceStatus AttendanceStatus          @default(NOT_VERIFIED)
+  verifiedAt       DateTime?
+
+  // Refund
+  refundStatus     RefundStatus              @default(NONE)
+  refundReason     String?
+
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@map("event_registrations")
+}
+
+enum EventStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum AttendanceStatus {
+  NOT_VERIFIED
+  VERIFIED
+  ABSENT
+}
+
+enum RefundStatus {
+  NONE
+  PENDING
+  PROCESSED
 }

@@ -10,7 +10,8 @@ import { Plus } from "lucide-react";
 import {
   LayoutDashboard, FileCheck, FilePlus, Wand2,
   Files, History, Mail, Edit, MonitorUp, Globe,
-  TrendingUp, Link as LinkIcon, Briefcase, User, Rss, PenSquare
+  TrendingUp, Link as LinkIcon, Briefcase, User, Rss, PenSquare,
+  CalendarDays, Ticket, CalendarCheck
 } from "lucide-react";
 import { CreatePost } from "@/components/feed/create-post";
 import { Post } from "@/apis/posts.api";
@@ -59,6 +60,14 @@ export const navigation = [
     items: [
       { name: "Connect GitHub", href: "/dashboard/connect/github", icon: LinkIcon },
       { name: "Connect LinkedIn", href: "/dashboard/connect/linkedin", icon: Briefcase },
+    ]
+  },
+  {
+    title: "Events",
+    items: [
+      { name: "All Events",        href: "/dashboard/events",                  icon: CalendarDays },
+      { name: "My Registrations",  href: "/dashboard/events/my-registrations", icon: Ticket },
+      { name: "My Events (Host)",  href: "/dashboard/events/my-events",        icon: CalendarCheck },
     ]
   },
   {

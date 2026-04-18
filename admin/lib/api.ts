@@ -72,6 +72,21 @@ export interface AdminStats {
   pendingDocs: number;
   verifiedDocs: number;
   rejectedDocs: number;
+  totalEvents: number;
+  pendingRefunds: number;
+}
+
+export interface AdminEvent {
+  id: string;
+  title: string;
+  status: 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
+  eventDate: string;
+  venue: string;
+  price: number;
+  isListed: boolean;
+  createdAt: string;
+  organizer: { id: string; firstName: string; lastName: string; email: string };
+  _count: { registrations: number };
 }
 
 // ── API calls ──────────────────────────────────────────────────────────────
@@ -98,6 +113,15 @@ export const api = {
 
   rejectDoc: (companyId: string, reason: string) =>
     adminApi.patch(`/admin/docs/${companyId}/reject`, { reason }).then((r) => r.data),
+
+  getAllEvents: () =>
+    adminApi.get('/admin/events').then((r) => r.data as { success: boolean; data: AdminEvent[] }),
+
+  cancelEvent: (id: string) =>
+    adminApi.post(`/admin/events/${id}/cancel`).then((r) => r.data),
+
+  getEventRegistrations: (id: string) =>
+    adminApi.get(`/admin/events/${id}/registrations`).then((r) => r.data),
 };
 
 export default adminApi;

@@ -165,7 +165,7 @@ export class AdminController {
   // GET /admin/stats — dashboard overview numbers
   static async getStats(req: Request, res: Response, next: NextFunction) {
     try {
-      const [totalUsers, totalFounders, totalPosts, pendingDocs, verifiedDocs, rejectedDocs] =
+      const [totalUsers, totalFounders, totalPosts, pendingDocs, verifiedDocs, rejectedDocs, totalEvents, pendingRefunds] =
         await Promise.all([
           prisma.user.count({ where: { role: 'USER' } }),
           prisma.user.count({ where: { role: 'FOUNDER' } }),
@@ -173,14 +173,67 @@ export class AdminController {
           prisma.company.count({ where: { docVerificationStatus: 'PENDING' } }),
           prisma.company.count({ where: { docVerificationStatus: 'VERIFIED' } }),
           prisma.company.count({ where: { docVerificationStatus: 'REJECTED' } }),
+          prisma.event.count({ where: { isListed: true } }),
+          prisma.eventRegistration.count({ where: { refundStatus: 'PENDING' } }),
         ]);
 
       return res.json({
         success: true,
-        data: { totalUsers, totalFounders, totalPosts, pendingDocs, verifiedDocs, rejectedDocs },
+        data: { totalUsers, totalFounders, totalPosts, pendingDocs, verifiedDocs, rejectedDocs, totalEvents, pendingRefunds },
       });
     } catch (error) {
       next(error);
     }
+  }
+
+  // GET /admin/events — all events
+  static async getAllEvents(req: Request, res: Response, next: NextFunction) {
+    try {
+      const events = await prisma.event.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          organizer: { select: { id: true, firstName: true, lastName: true, email: true } },
+          _count: { select: { registrations: { where: { paymentStatus: 'PAID' } } } },
+        },
+      });
+      return res.json({ success: true, data: events });
+    } catch (error) { next(error); }
+  }
+
+  // POST /admin/events/:id/cancel — admin force-cancels event
+  static async cancelEvent(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      await prisma.$transaction([
+        prisma.event.update({ where: { id }, data: { status: 'CANCELLED' } }),
+        prisma.eventRegistration.updateMany({
+          where: { eventId: id, paymentStatus: 'PAID' },
+          data: { refundStatus: 'PENDING', refundReason: 'Event cancelled by admin' },
+        }),
+      ]);
+      return res.json({ success: true, message: 'Event cancelled and refunds queued' });
+    } catch (error) { next(error); }
+  }
+
+  // GET /admin/events/:id/registrations — admin view (stripped of private info)
+  static async getEventRegistrations(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const regs = await prisma.eventRegistration.findMany({
+        where: { eventId: id, paymentStatus: 'PAID' },
+        select: {
+          id: true,
+          participantName: true,
+          participantEmail: true,
+          amountPaid: true,
+          attendanceStatus: true,
+          refundStatus: true,
+          refundReason: true,
+          createdAt: true,
+          // attendanceCode, participantPhone, paymentId intentionally hidden from admin
+        },
+      });
+      return res.json({ success: true, data: regs });
+    } catch (error) { next(error); }
   }
 }

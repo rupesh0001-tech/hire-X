@@ -4,13 +4,14 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   Shield, LayoutDashboard, Users, FileCheck,
-  LogOut, Menu, X, ChevronRight,
+  LogOut, Menu, X, ChevronRight, CalendarDays,
 } from "lucide-react";
 
 const NAV = [
   { label: "Overview",     href: "/dashboard",       icon: LayoutDashboard },
   { label: "All Users",    href: "/dashboard/users",  icon: Users },
   { label: "Verify Docs",  href: "/dashboard/docs",   icon: FileCheck },
+  { label: "Events",       href: "/dashboard/events", icon: CalendarDays },
 ];
 
 function cn(...cls: (string | boolean | undefined)[]) {
