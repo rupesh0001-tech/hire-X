@@ -39,8 +39,12 @@ export const authApi = {
     return response.data;
   },
 
+  getUserProfile: async (id: string): Promise<{ success: boolean; data: any }> => {
+    const response = await api.get(`/user/profile/${id}`);
+    return response.data;
+  },
+
   logout: async () => {
-    // Usually frontend only, but can be API call
     return { success: true };
   }
 };

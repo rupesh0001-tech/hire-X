@@ -40,7 +40,7 @@ export function PromoteModal({ post, onClose, onPromoted }: PromoteModalProps) {
       if (!loaded) throw new Error("Razorpay SDK failed to load. Check your connection.");
 
       const orderRes = await postsApi.createPromotionOrder(post.id);
-      if (!orderRes.success) throw new Error("Could not create payment order");
+      if (!orderRes.success) throw new Error((orderRes as any).message || "Could not create payment order");
 
       const { orderId, amount, currency, keyId } = orderRes.data;
 

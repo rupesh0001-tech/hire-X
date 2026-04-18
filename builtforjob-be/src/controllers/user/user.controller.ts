@@ -151,4 +151,79 @@ export class UserController {
       next(error);
     }
   }
+
+  // GET /user/profile/:id — view any user's public profile
+  static async getPublicProfile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const user = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          avatarUrl: true,
+          jobTitle: true,
+          bio: true,
+          location: true,
+          role: true,
+          isVerified: true,
+          createdAt: true,
+          company: {
+            select: { name: true, description: true, website: true, industry: true, logoUrl: true }
+          },
+          skills: { select: { id: true, name: true } },
+          experience: true,
+          education: true,
+          projects: true,
+          posts: {
+            orderBy: { createdAt: 'desc' },
+            take: 20,
+            include: {
+              likes: { select: { userId: true } },
+              comments: {
+                orderBy: { createdAt: 'asc' },
+                include: {
+                  author: {
+                    select: { id: true, firstName: true, lastName: true, avatarUrl: true, role: true }
+                  }
+                }
+              },
+              _count: { select: { likes: true, comments: true } },
+            }
+          },
+          _count: { select: { posts: true } },
+        },
+      });
+
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+      const viewerId = req.user?.userId;
+      const enrichedPosts = user.posts.map((p) => ({
+        ...p,
+        author: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          avatarUrl: user.avatarUrl,
+          jobTitle: user.jobTitle,
+          role: user.role,
+          company: user.company,
+        },
+        authorId: user.id,
+        isLikedByMe: viewerId ? p.likes.some((l) => l.userId === viewerId) : false,
+        isSponsored: false,
+      }));
+
+      return res.json({
+        success: true,
+        data: { ...user, posts: enrichedPosts },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+
