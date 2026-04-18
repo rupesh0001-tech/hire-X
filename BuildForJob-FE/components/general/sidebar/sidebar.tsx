@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, FileCheck, FilePlus, Wand2, 
   Files, History, Mail, Edit, MonitorUp, Globe, 
-  TrendingUp, Link as LinkIcon, Briefcase, User 
+  TrendingUp, Link as LinkIcon, Briefcase, User, Rss
 } from "lucide-react";
 
 export const navigation = [
@@ -16,6 +16,7 @@ export const navigation = [
     title: "Dashboard",
     items: [
       { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { name: "Feed", href: "/dashboard/feed", icon: Rss },
     ]
   },
   {

@@ -8,6 +8,7 @@ export interface User {
   location?: string;
   avatarUrl?: string;
   jobTitle?: string;
+  role?: 'USER' | 'FOUNDER';
   isVerified?: boolean;
   createdAt?: string;
 

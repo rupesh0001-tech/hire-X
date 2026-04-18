@@ -44,6 +44,11 @@ model User {
   resumes      Resume[]
   coverLetters CoverLetter[]
 
+  // Social Feed
+  posts        Post[]
+  likes        Like[]
+  comments     Comment[]
+
   @@map("users")
 }
 
@@ -197,4 +202,54 @@ model Company {
   updatedAt   DateTime @updatedAt
 
   @@map("companies")
+}
+
+// Social Feed
+
+model Post {
+  id          String     @id @default(uuid())
+  type        PostType   @default(TEXT)
+  content     String?    @db.Text
+  imageUrl    String?
+  imageFileId String?
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes       Like[]
+  comments    Comment[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([postId, userId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId])
+  @@map("comments")
+}
+
+enum PostType {
+  TEXT
+  IMAGE
 }
