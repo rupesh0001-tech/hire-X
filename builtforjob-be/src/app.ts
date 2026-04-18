@@ -3,6 +3,7 @@ import cors from 'cors';
 import { userRouter } from './routes/user/user.routes';
 import { otpRouter } from './routes/otp/otp.routes';
 import { faceRouter } from './routes/face/face.routes';
+import { companyRouter } from './routes/company/company.routes';
 import { errorMiddleware } from './middlewares/error/error.middleware';
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json({ limit: '5mb' })); // larger limit for descriptor arrays
 app.use('/user', userRouter);
 app.use('/verify', otpRouter);
 app.use('/face', faceRouter);
+app.use('/company', companyRouter);
 
 // Root
 app.get('/', (req, res) => {

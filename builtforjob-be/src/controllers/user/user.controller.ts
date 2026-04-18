@@ -4,12 +4,13 @@ import { HashService } from '../../services/hash/hash.service';
 import { JWTService } from '../../services/jwt/jwt.service';
 import type { AuthRequest } from '../../middlewares/auth/jwt.middleware';
 import { EmailService } from '../../services/email/email.service';
+import prisma from '../../config/database/db';
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
     console.log('--- REGISTER REQUEST RECEIVED ---', req.body.email);
     try {
-      const { email, password, firstName, lastName } = req.body;
+      const { email, password, firstName, lastName, role } = req.body;
 
       const existingUser = await UserService.findByEmail(email);
       let user;
@@ -25,6 +26,9 @@ export class UserController {
           firstName,
           lastName,
         });
+        if (role) {
+          await prisma.user.update({ where: { id: existingUser.id }, data: { role } });
+        }
       } else {
         const hashedPassword = await HashService.hashPassword(password);
         user = await UserService.createUser({
@@ -32,6 +36,7 @@ export class UserController {
           password: hashedPassword,
           firstName,
           lastName,
+          role: role || 'USER',
         });
       }
 

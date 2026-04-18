@@ -67,6 +67,7 @@ export interface RegisterData {
   password?: string;
   firstName: string;
   lastName: string;
+  role?: 'USER' | 'FOUNDER';
 }
 
 export interface VerifyOtpData {

@@ -20,13 +20,14 @@ export class UserService {
     });
   }
 
-  static async createUser(data: Omit<IUser, 'id' | 'isVerified' | 'createdAt' | 'updatedAt'>) {
+  static async createUser(data: Omit<IUser, 'id' | 'isVerified' | 'createdAt' | 'updatedAt'> & { role?: string }) {
     return prisma.user.create({
       data: {
         email: data.email,
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
+        role: (data.role as any) || 'USER',
       },
     });
   }

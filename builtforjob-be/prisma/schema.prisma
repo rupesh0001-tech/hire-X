@@ -22,10 +22,13 @@ model User {
   location  String?
   avatarUrl String?
   jobTitle  String?
-  isVerified      Boolean @default(false)
-  faceDescriptor  Json?   // 128-float array from face-api.js
+  role            UserRole @default(USER)
+  isVerified      Boolean  @default(false)
+  faceDescriptor  Json?    // 128-float array from face-api.js
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  company         Company?
 
   // Profile Builder Relations
   skills      Skill[]
@@ -171,4 +174,27 @@ model PasswordResetToken {
 enum OTPType {
   REGISTRATION
   PASSWORD_RESET
+}
+
+enum UserRole {
+  USER
+  FOUNDER
+}
+
+model Company {
+  id          String   @id @default(uuid())
+  name        String
+  description String?  @db.Text
+  website     String?
+  industry    String?
+  logoUrl     String?  // ImageKit URL
+  logoFileId  String?  // ImageKit file ID for deletion
+  docUrl      String?  // Owner documentation ImageKit URL
+  docFileId   String?  // ImageKit file ID
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("companies")
 }
