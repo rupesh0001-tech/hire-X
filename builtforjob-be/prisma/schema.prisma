@@ -1,0 +1,174 @@
+// Prisma Database Schema
+// Run: bun run db:generate && bun run db:push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  bio       String?
+  location  String?
+  avatarUrl String?
+  jobTitle  String?
+  isVerified      Boolean @default(false)
+  faceDescriptor  Json?   // 128-float array from face-api.js
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile Builder Relations
+  skills      Skill[]
+  experience  Experience[]
+  education   Education[]
+  projects    Project[]
+  socialLinks Json?    @default("{}")
+
+  otps              OTP[]
+  passwordResetTokens PasswordResetToken[]
+
+  // Document Management
+  resumes      Resume[]
+  coverLetters CoverLetter[]
+
+  @@map("users")
+}
+
+model Resume {
+  id          String   @id @default(uuid())
+  title       String
+  company     String?
+  template    String   @default("Modern")
+  content     Json?    // Snapshot of the resume data
+  isMagic     Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  versions    ResumeVersion[]
+
+  @@map("resumes")
+}
+
+model ResumeVersion {
+  id          String   @id @default(uuid())
+  company     String?
+  role        String
+  resumeId    String
+  resume      Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  status      String   @default("Active") // e.g., "Active", "Applied", "Draft"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("resume_versions")
+}
+
+model CoverLetter {
+  id          String   @id @default(uuid())
+  title       String
+  company     String?
+  recipient   String?
+  content     String?   @db.Text
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("cover_letters")
+}
+
+model Skill {
+  id             String   @id @default(uuid())
+  name           String
+  isGithubSynced Boolean  @default(false)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("skills")
+}
+
+model Experience {
+  id          String   @id @default(uuid())
+  company     String
+  position    String
+  startDate   String
+  endDate     String?
+  description String?
+  isCurrent   Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("experiences")
+}
+
+model Education {
+  id             String   @id @default(uuid())
+  institution    String
+  degree         String
+  field          String
+  graduationDate String
+  gpa            String?
+  graduationType String?  // e.g. "cgpa" or "percentage"
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("educations")
+}
+
+model Project {
+  id             String   @id @default(uuid())
+  name           String
+  techStack      String?
+  description    String?
+  isGithubSynced Boolean  @default(false)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("projects")
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  userId    String?
+  email     String
+  code      String
+  type      OTPType
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, type, isUsed])
+  @@map("otps")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token, isUsed])
+  @@map("password_reset_tokens")
+}
+
+enum OTPType {
+  REGISTRATION
+  PASSWORD_RESET
+}
