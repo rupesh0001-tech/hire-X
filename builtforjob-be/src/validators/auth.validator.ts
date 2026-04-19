@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const registerSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email('Invalid email format').regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email contains invalid characters. Greek/non-English inputs are blocked.'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -13,17 +13,17 @@ export const registerSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email('Invalid email format').regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email contains invalid characters. Greek/non-English inputs are blocked.'),
   password: z.string().min(1, 'Password is required'),
 });
 
 export const verifyOTPSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email('Invalid email format').regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email contains invalid characters. Greek/non-English inputs are blocked.'),
   otp: z.string().length(6, 'OTP must be 6 digits'),
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email('Invalid email format').regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email contains invalid characters. Greek/non-English inputs are blocked.'),
 });
 
 export const resetPasswordSchema = z.object({
@@ -37,6 +37,6 @@ export const resetPasswordSchema = z.object({
 });
 
 export const resendOTPSchema = z.object({
-  email: z.string().email('Invalid email format'),
+  email: z.string().email('Invalid email format').regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email contains invalid characters. Greek/non-English inputs are blocked.'),
   type: z.enum(['REGISTRATION', 'PASSWORD_RESET', 'LOGIN']),
 });

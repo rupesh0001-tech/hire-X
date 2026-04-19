@@ -98,6 +98,14 @@ export default function MarketplaceBrowsePage() {
 
                   <div className="mt-5 flex-1">
                     <h2 className="text-lg font-bold text-gray-900 dark:text-white">{l.title}</h2>
+                    {l.concernsCount > 0 && (
+                      <div className="mt-2 bg-red-500/10 border border-red-500/20 rounded-lg p-2 flex items-start gap-2">
+                         <span className="text-lg">⚠️</span>
+                         <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                           Caution: marked as concerned ({l.concernsCount} user reports). Verify thoroughly before applying.
+                         </p>
+                      </div>
+                    )}
                     <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{l.description}</p>
                     
                     <div className="mt-4 bg-gray-50 dark:bg-white/5 rounded-xl p-4 border border-gray-100 dark:border-white/5 space-y-3">
@@ -121,15 +129,17 @@ export default function MarketplaceBrowsePage() {
                   <div className="mt-5 pt-5 border-t border-gray-100 dark:border-white/5 flex items-center justify-between">
                     <span className="text-xs text-gray-500">{l._count?.applications || 0} interested</span>
                     <button
-                      disabled={l.creatorId === user?.id}
+                      disabled={l.creatorId === user?.id || (l.applications && l.applications.length > 0)}
                       onClick={() => setApplyingTo(l)}
                       className={`px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 transition-colors ${
                         l.creatorId === user?.id 
                         ? 'bg-gray-100 dark:bg-white/5 text-gray-400 cursor-not-allowed' 
+                        : (l.applications && l.applications.length > 0)
+                        ? 'bg-purple-100 dark:bg-purple-500/10 text-purple-500 border border-purple-500/20 cursor-not-allowed'
                         : 'bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'
                       }`}
                     >
-                      {l.creatorId === user?.id ? 'Your Listing' : <><HeartHandshake size={15}/> I am interested</>}
+                      {l.creatorId === user?.id ? 'Your Listing' : (l.applications && l.applications.length > 0) ? 'Applied' : <><HeartHandshake size={15}/> I am interested</>}
                     </button>
                   </div>
                 </motion.div>

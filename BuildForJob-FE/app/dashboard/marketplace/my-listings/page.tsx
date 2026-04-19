@@ -42,6 +42,31 @@ export default function MyListingsPage() {
     }
   };
 
+  const handleWithdraw = async (listingId: string, appId: string) => {
+    if (!confirm("Are you sure you want to withdraw and terminate this contract?")) return;
+    try {
+      const res = await marketplaceApi.withdrawApplication(listingId, appId);
+      if (res.success) {
+        setListings(prev => prev.map(l => (l.id === listingId ? { ...l, applications: l.applications?.map(a => a.id === appId ? { ...a, status: 'WITHDRAWN' } : a) } : l)));
+      }
+    } catch(err:any) { alert(err.response?.data?.message || "Error"); }
+  };
+
+  const handleReport = async (listingId: string, appId: string) => {
+    if (!confirm("Are you sure you want to report this user? This will terminate the contract and flag the listing.")) return;
+    try {
+      const res = await marketplaceApi.reportApplication(listingId, appId);
+      if (res.success) {
+        setListings(prev => prev.map(l => (l.id === listingId ? { ...l, applications: l.applications?.map(a => a.id === appId ? { ...a, status: 'TERMINATED' } : a) } : l)));
+      }
+    } catch(err:any) { alert(err.response?.data?.message || "Error"); }
+  };
+
+  const isReportable = (updatedAt: string) => {
+    const days = (new Date().getTime() - new Date(updatedAt).getTime()) / (1000 * 3600 * 24);
+    return days <= 15;
+  };
+
   if (loading) {
     return <div className="flex justify-center py-32"><Loader2 className="animate-spin text-purple-500" /></div>;
   }
@@ -121,9 +146,29 @@ export default function MyListingsPage() {
                             </button>
                           </div>
                         ) : (
-                          <span className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold uppercase ${app.status === 'ACCEPTED' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
-                            {app.status}
-                          </span>
+                          <div className="flex flex-col items-end gap-2 shrink-0">
+                            <span className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase ${
+                              app.status === 'ACCEPTED' ? 'bg-green-500/10 text-green-500' : 
+                              app.status === 'WITHDRAWN' ? 'bg-gray-500/10 text-gray-500' :
+                              app.status === 'TERMINATED' ? 'bg-red-900/10 text-red-700' :
+                              'bg-red-500/10 text-red-500'}`
+                            }>
+                              {app.status}
+                            </span>
+                            
+                            {app.status === 'ACCEPTED' && (
+                              <div className="flex gap-2 mt-1">
+                                <button onClick={() => handleWithdraw(listing.id, app.id)} className="text-[10px] uppercase font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded">
+                                  Withdraw
+                                </button>
+                                {isReportable(app.updatedAt) && (
+                                  <button onClick={() => handleReport(listing.id, app.id)} className="text-[10px] uppercase font-bold text-red-500 hover:text-red-700 transition-colors bg-red-500/5 border border-red-500/20 px-2 py-1 rounded">
+                                    Report Middleman
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     ))}

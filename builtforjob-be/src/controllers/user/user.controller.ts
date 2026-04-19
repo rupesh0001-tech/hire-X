@@ -14,12 +14,12 @@ export class UserController {
 
       const existingUser = await UserService.findByEmail(email);
       let user;
-      
+
       if (existingUser) {
         if (existingUser.isVerified) {
           return res.status(400).json({ success: false, message: 'Email already exists and is verified' });
         }
-        
+
         const hashedPassword = await HashService.hashPassword(password);
         user = await UserService.updateUser(existingUser.id, {
           password: hashedPassword,
@@ -109,7 +109,7 @@ export class UserController {
       // Generate reset token and OTP/Link logic
       // User said "get a reset pass link on email"
       const resetToken = JWTService.generateToken({ userId: user.id, email: user.email }, '1h');
-      
+
       await EmailService.sendPasswordResetEmail(email, resetToken, user.firstName);
 
       return res.json({ success: true, message: 'Password reset link sent to your email' });
@@ -221,6 +221,17 @@ export class UserController {
         success: true,
         data: { ...user, posts: enrichedPosts },
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async searchUserByShortId(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { shortId } = req.params;
+      const user = await UserService.findByShortId(shortId);
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+      return res.json({ success: true, data: user });
     } catch (error) {
       next(error);
     }

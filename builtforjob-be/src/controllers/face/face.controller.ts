@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import prisma from '../../config/database/db';
 import { JWTService } from '../../services/jwt/jwt.service';
+import { ImageKitService } from '../../services/imagekit/imagekit.service';
 
 // Euclidean distance between two descriptors
 function euclideanDistance(a: number[], b: number[]): number {
@@ -76,6 +77,73 @@ export class FaceController {
             lastName: user.lastName,
           },
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // POST /face/verify-photo
+  static async verifyPhoto(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = (req as any).user?.userId;
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+      }
+
+      // We expect 'descriptor' to be a JSON string of array because of FormData
+      const descriptorStr = req.body.descriptor;
+      let descriptor: number[];
+      try {
+        descriptor = JSON.parse(descriptorStr);
+      } catch (err) {
+        return res.status(400).json({ success: false, message: 'Invalid face descriptor format' });
+      }
+
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ success: false, message: 'Profile photo is required' });
+      }
+
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+
+      if (!user.faceDescriptor) {
+        return res.status(400).json({ success: false, message: 'No face registered for this account. Please register your face first.' });
+      }
+
+      const saved = user.faceDescriptor as number[];
+      const distance = euclideanDistance(descriptor, saved);
+
+      console.log(`Face distance for photo upload ${user.email}: ${distance}`);
+
+      if (distance > FACE_MATCH_THRESHOLD) {
+        return res.status(401).json({ success: false, message: 'Face in photo does not match registered face. Please upload your own photo.' });
+      }
+
+      // Upload the photo to ImageKit
+      const uploaded = await ImageKitService.uploadFile(
+        file.buffer,
+        `profile-${userId}-${Date.now()}`,
+        '/users/profiles'
+      );
+
+      const avatarUrl = uploaded.url;
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          avatarUrl,
+          isVerified: true
+        }
+      });
+
+      return res.json({
+        success: true,
+        message: 'Profile photo verified and updated successfully',
+        data: { avatarUrl }
       });
     } catch (error) {
       next(error);

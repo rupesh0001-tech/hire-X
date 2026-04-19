@@ -29,6 +29,27 @@ export class UserService {
     });
   }
 
+  static async findByShortId(shortId: string) {
+    return prisma.user.findUnique({
+      where: { shortId },
+      include: {
+        skills: true,
+        experience: true,
+        education: true,
+        projects: true,
+        company: {
+          select: {
+            id: true,
+            name: true,
+            logoUrl: true,
+            industry: true,
+            docVerificationStatus: true,
+          },
+        },
+      }
+    });
+  }
+
   static async createUser(data: Omit<IUser, 'id' | 'isVerified' | 'createdAt' | 'updatedAt'> & { role?: string }) {
     return prisma.user.create({
       data: {
@@ -37,6 +58,7 @@ export class UserService {
         firstName: data.firstName,
         lastName: data.lastName,
         role: (data.role as any) || 'USER',
+        shortId: Math.random().toString(36).substring(2, 8).toUpperCase(),
       },
     });
   }

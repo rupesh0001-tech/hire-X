@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { user } = useAppSelector((state) => state.auth);
@@ -33,11 +33,15 @@ export function UserDropdown() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 border-2 border-white dark:border-black shadow-lg shadow-purple-500/20 cursor-pointer hover:scale-105 transition-transform flex items-center justify-center text-white font-bold text-xs uppercase"
+        className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 to-blue-500 border-2 border-white dark:border-black shadow-lg shadow-purple-500/20 cursor-pointer hover:scale-105 transition-transform flex items-center justify-center text-white font-bold text-xs uppercase overflow-hidden"
       >
-        {user?.firstName?.[0]}{user?.lastName?.[0] || user?.email?.[0] || 'U'}
+        {user?.avatarUrl ? (
+          <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+        ) : (
+          `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || user?.email?.[0] || 'U'}`
+        )}
       </button>
 
       <AnimatePresence>
@@ -56,9 +60,9 @@ export function UserDropdown() {
                 {user?.email}
               </p>
             </div>
-            
+
             <div className="space-y-1">
-              <Link 
+              <Link
                 href="/dashboard"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
@@ -66,7 +70,7 @@ export function UserDropdown() {
                 <LayoutDashboard size={18} className="text-purple-500" />
                 Dashboard
               </Link>
-              <Link 
+              <Link
                 href="/dashboard/settings/profile"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
@@ -74,7 +78,7 @@ export function UserDropdown() {
                 <User size={18} className="text-blue-500" />
                 My Profile
               </Link>
-              <Link 
+              <Link
                 href="/dashboard/settings"
                 onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
@@ -83,9 +87,9 @@ export function UserDropdown() {
                 Settings
               </Link>
             </div>
-            
+
             <div className="mt-2 pt-2 border-t border-gray-100 dark:border-white/5">
-              <button 
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 w-full px-4 py-2.5 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 text-sm font-medium text-red-600 dark:text-red-400 transition-colors"
               >

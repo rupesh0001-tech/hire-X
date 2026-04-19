@@ -104,10 +104,10 @@ export default function MyProfilePage() {
         className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] overflow-hidden mb-4 shadow-sm"
       >
         {/* Banner */}
-        <div className="h-24 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 relative">
+        <div className="h-24 bg-gray-100 dark:bg-[#111116] border-b border-gray-200 dark:border-white/5 relative">
           <Link
             href="/dashboard/settings/profile"
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white/20 hover:bg-white/30 text-white rounded-xl backdrop-blur-sm transition-all"
+            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-800 dark:text-white border border-gray-200 dark:border-white/10 rounded-xl transition-all shadow-sm"
           >
             <Edit3 size={12} /> Edit Profile
           </Link>

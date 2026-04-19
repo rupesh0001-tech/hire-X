@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchProfile, updateProfile } from "@/store/slices/authSlice";
-import { 
-  Mail, User as UserIcon, Phone, MapPin, Briefcase, FileText, 
-  Camera, Save, Loader2, Plus, Trash2, GraduationCap, 
+import {
+  Mail, User as UserIcon, Phone, MapPin, Briefcase, FileText,
+  Camera, Save, Loader2, Plus, Trash2, GraduationCap,
   Code, Globe, Linkedin, Github, Twitter, RefreshCw, Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,13 +13,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { fetchGitHubData, extractUsername } from "@/lib/github/github-api";
 import { GithubSyncModal } from "@/components/profile/GithubSyncModal";
+import { ProfilePhotoUploadStep } from "@/components/sections/photo/ProfilePhotoUploadStep";
 
 type TabType = "personal" | "experience" | "education" | "projects" | "skills";
 
 export default function ProfileSettingsPage() {
   const dispatch = useAppDispatch();
   const { user, isLoading } = useAppSelector((state) => state.auth);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = (searchParams.get("tab") as TabType) || "personal";
@@ -34,8 +35,9 @@ export default function ProfileSettingsPage() {
   const [isFetchingGithub, setIsFetchingGithub] = useState(false);
   const [githubSyncData, setGithubSyncData] = useState<any>(null);
   const [showSyncModal, setShowSyncModal] = useState(false);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [hasSynced, setHasSynced] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -81,7 +83,7 @@ export default function ProfileSettingsPage() {
 
   const handleDisconnect = async () => {
     if (!confirm("Are you sure? This will disconnect GitHub and REMOVE all projects and skills synced from it.")) return;
-    
+
     try {
       setIsSaving(true);
       const updatedData = {
@@ -90,7 +92,7 @@ export default function ProfileSettingsPage() {
         skills: (formData.skills || []).filter((s: any) => !s.isGithubSynced),
         projects: (formData.projects || []).filter((p: any) => !p.isGithubSynced)
       };
-      
+
       await dispatch(updateProfile(updatedData)).unwrap();
       setFormData(updatedData as any);
       setHasSynced(false);
@@ -213,11 +215,10 @@ export default function ProfileSettingsPage() {
     <button
       type="button"
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-        activeTab === id 
-          ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20" 
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === id
+          ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
           : "text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5"
-      }`}
+        }`}
     >
       <Icon size={16} />
       {label}
@@ -233,20 +234,20 @@ export default function ProfileSettingsPage() {
         </div>
         <div className="flex items-center gap-4 bg-white dark:bg-[#111116] border border-gray-200 dark:border-white/10 px-5 py-3 rounded-2xl shadow-sm">
           <div className="relative w-14 h-14 flex items-center justify-center">
-             <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" className="text-gray-100 dark:text-white/5" />
-                <motion.circle 
-                  cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="text-purple-500/30 blur-[2px]"
-                  initial={{ strokeDasharray: "0 113.1" }} animate={{ strokeDasharray: `${(completionPercent / 100) * 113.1} 113.1` }} transition={{ duration: 1.2, ease: "circOut" }}
-                />
-                <motion.circle 
-                  cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="text-purple-500"
-                  initial={{ strokeDasharray: "0 113.1" }} animate={{ strokeDasharray: `${(completionPercent / 100) * 113.1} 113.1` }} transition={{ duration: 1, ease: "circOut" }}
-                />
-             </svg>
-             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[10px] font-bold text-black dark:text-white">{completionPercent}%</span>
-             </div>
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 44 44">
+              <circle cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" className="text-gray-100 dark:text-white/5" />
+              <motion.circle
+                cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="text-purple-500/30 blur-[2px]"
+                initial={{ strokeDasharray: "0 113.1" }} animate={{ strokeDasharray: `${(completionPercent / 100) * 113.1} 113.1` }} transition={{ duration: 1.2, ease: "circOut" }}
+              />
+              <motion.circle
+                cx="22" cy="22" r="18" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" className="text-purple-500"
+                initial={{ strokeDasharray: "0 113.1" }} animate={{ strokeDasharray: `${(completionPercent / 100) * 113.1} 113.1` }} transition={{ duration: 1, ease: "circOut" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[10px] font-bold text-black dark:text-white">{completionPercent}%</span>
+            </div>
           </div>
         </div>
       </header>
@@ -261,18 +262,31 @@ export default function ProfileSettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white dark:bg-[#111116] rounded-3xl border border-gray-200 dark:border-white/10 p-8 text-center shadow-sm relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-500 to-blue-600" />
-            <div className="relative w-32 h-32 mx-auto mb-6">
-              <div className="w-full h-full rounded-full bg-linear-to-br from-purple-500 via-purple-600 to-blue-600 flex items-center justify-center text-white text-4xl font-extrabold shadow-2xl ring-4 ring-white dark:ring-white/5 transition-transform duration-500 group-hover:scale-105">
-                {user?.firstName?.[0]?.toUpperCase()}{user?.lastName?.[0]?.toUpperCase()}
-              </div>
-              <button type="button" className="absolute bottom-1 right-1 p-2.5 rounded-full bg-white dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-purple-500 shadow-xl hover:bg-purple-500 hover:text-white transition-all duration-300 transform hover:scale-110 active:scale-95">
+          <div className="bg-white dark:bg-[#111116] rounded-3xl border border-gray-200 dark:border-white/10 p-8 text-center shadow-sm relative group overflow-visible">
+            <div className="relative w-32 h-32 mx-auto mb-6 mt-4">
+              {user?.avatarUrl ? (
+                <img src={user.avatarUrl} alt="Profile" className="w-full h-full rounded-full object-cover shadow-2xl ring-4 ring-white dark:ring-white/5 transition-transform duration-500 group-hover:scale-105" />
+              ) : (
+                <div className="w-full h-full rounded-full bg-linear-to-br from-purple-500 via-purple-600 to-blue-600 flex items-center justify-center text-white text-4xl font-extrabold shadow-2xl ring-4 ring-white dark:ring-white/5 transition-transform duration-500 group-hover:scale-105">
+                  {user?.firstName?.[0]?.toUpperCase()}{user?.lastName?.[0]?.toUpperCase()}
+                </div>
+              )}
+              <button 
+                type="button" 
+                onClick={() => setShowPhotoModal(true)}
+                className="absolute bottom-1 right-1 p-2.5 rounded-full bg-white dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-purple-500 shadow-xl hover:bg-purple-500 hover:text-white transition-all duration-300 transform hover:scale-110 active:scale-95"
+              >
                 <Camera size={18} />
               </button>
             </div>
             <h2 className="text-xl font-bold text-black dark:text-white tracking-tight">{formData.firstName} {formData.lastName}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{formData.jobTitle || "Your Career Start"}</p>
+            {user?.shortId && (
+              <div className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-white/5">
+                <span>DevClash ID:</span>
+                <span className="font-mono text-purple-600 dark:text-purple-400 select-all">{user.shortId}</span>
+              </div>
+            )}
           </div>
 
           <div className="bg-white dark:bg-[#111116] rounded-3xl border border-gray-200 dark:border-white/10 p-6 shadow-sm space-y-4">
@@ -286,10 +300,10 @@ export default function ProfileSettingsPage() {
               ].map(s => (
                 <div key={s.name} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-transparent hover:border-purple-500/30 transition-all group">
                   <s.icon size={18} className="text-gray-400 group-hover:text-purple-500" />
-                  <input 
-                    type="text" 
-                    name={s.name} 
-                    value={(formData as any).socialLinks[s.name.split('.')[1]]} 
+                  <input
+                    type="text"
+                    name={s.name}
+                    value={(formData as any).socialLinks[s.name.split('.')[1]]}
                     onChange={handleChange}
                     placeholder={s.placeholder}
                     className="bg-transparent border-none outline-none text-xs w-full text-black dark:text-white"
@@ -299,7 +313,7 @@ export default function ProfileSettingsPage() {
               <div className="pt-4 px-2">
                 <div className="flex items-center gap-2">
                   {!isAlreadySynced && (
-                    <button 
+                    <button
                       type="button"
                       onClick={handleGithubSync}
                       disabled={isFetchingGithub || !formData.socialLinks.github}
@@ -338,7 +352,7 @@ export default function ProfileSettingsPage() {
           <div className="bg-white dark:bg-[#111116] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm space-y-8 relative overflow-hidden">
             <AnimatePresence mode="wait">
               {activeTab === "personal" && (
-                <motion.div 
+                <motion.div
                   key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
@@ -347,7 +361,7 @@ export default function ProfileSettingsPage() {
                       <label className="text-[11px] uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                         <UserIcon size={12} className="text-purple-500" /> First Name
                       </label>
-                      <input 
+                      <input
                         type="text" name="firstName" value={formData.firstName} onChange={handleChange}
                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
                       />
@@ -356,7 +370,7 @@ export default function ProfileSettingsPage() {
                       <label className="text-[11px] uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                         <UserIcon size={12} className="text-purple-500" /> Last Name
                       </label>
-                      <input 
+                      <input
                         type="text" name="lastName" value={formData.lastName} onChange={handleChange}
                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
                       />
@@ -375,7 +389,7 @@ export default function ProfileSettingsPage() {
                       <label className="text-[11px] uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                         <Phone size={12} className="text-purple-500" /> Phone Number
                       </label>
-                      <input 
+                      <input
                         type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000"
                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
                       />
@@ -384,7 +398,7 @@ export default function ProfileSettingsPage() {
                       <label className="text-[11px] uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                         <MapPin size={12} className="text-purple-500" /> Location
                       </label>
-                      <input 
+                      <input
                         type="text" name="location" value={formData.location} onChange={handleChange} placeholder="City, Country"
                         className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
                       />
@@ -395,7 +409,7 @@ export default function ProfileSettingsPage() {
                     <label className="text-[11px) uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                       <Briefcase size={12} className="text-purple-500" /> Job Title
                     </label>
-                    <input 
+                    <input
                       type="text" name="jobTitle" value={formData.jobTitle} onChange={handleChange}
                       className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
                     />
@@ -405,7 +419,7 @@ export default function ProfileSettingsPage() {
                     <label className="text-[11px uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400 flex items-center gap-2 px-1">
                       <FileText size={12} className="text-purple-500" /> Bio / Professional Summary
                     </label>
-                    <textarea 
+                    <textarea
                       name="bio" value={formData.bio} onChange={handleChange} rows={4} placeholder="Describe yourself..."
                       className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border border-gray-200 dark:border-white/10 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition-all font-medium resize-none min-h-[120px]"
                     />
@@ -480,9 +494,9 @@ export default function ProfileSettingsPage() {
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <input 
-                      type="text" 
-                      placeholder="Add a skill (e.g. React.js)" 
+                    <input
+                      type="text"
+                      placeholder="Add a skill (e.g. React.js)"
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
@@ -493,7 +507,7 @@ export default function ProfileSettingsPage() {
                           }
                         }
                       }}
-                      className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border dark:border-white/10 focus:ring-2 focus:ring-purple-500/30 outline-none" 
+                      className="flex-1 px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#1a1a22] border dark:border-white/10 focus:ring-2 focus:ring-purple-500/30 outline-none"
                     />
                     <button type="button" onClick={(e) => {
                       const input = (e.currentTarget.previousSibling as HTMLInputElement);
@@ -522,7 +536,7 @@ export default function ProfileSettingsPage() {
       </div>
 
       {githubSyncData && (
-        <GithubSyncModal 
+        <GithubSyncModal
           key={githubSyncData.profile.html_url}
           isOpen={showSyncModal}
           onClose={() => setShowSyncModal(false)}
@@ -530,6 +544,25 @@ export default function ProfileSettingsPage() {
           currentData={formData}
           onSync={onGithubDataMerged}
         />
+      )}
+
+      {/* Photo Upload Modal */}
+      {showPhotoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-[#111116] border border-gray-200 dark:border-white/10 rounded-3xl p-8 max-w-md w-full relative shadow-2xl">
+            <button 
+              onClick={() => setShowPhotoModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold mb-6">Update Profile Photo</h2>
+            <ProfilePhotoUploadStep onComplete={() => {
+              setShowPhotoModal(false);
+              dispatch(fetchProfile() as any);
+            }} />
+          </div>
+        </div>
       )}
     </div>
   );

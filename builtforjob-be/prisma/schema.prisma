@@ -10,34 +10,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  phone     String?
-  bio       String?
-  location  String?
-  avatarUrl String?
-  jobTitle  String?
-  role            UserRole @default(USER)
-  isVerified      Boolean  @default(false)
-  faceDescriptor  Json?    // 128-float array from face-api.js
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(uuid())
+  shortId        String?  @unique
+  email          String   @unique
+  password       String
+  firstName      String
+  lastName       String
+  phone          String?
+  bio            String?
+  location       String?
+  avatarUrl      String?
+  jobTitle       String?
+  role           UserRole @default(USER)
+  isVerified     Boolean  @default(false)
+  faceDescriptor Json? // 128-float array from face-api.js
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  company         Company?
+  company Company?
 
   // Profile Builder Relations
   skills      Skill[]
   experience  Experience[]
   education   Education[]
   projects    Project[]
-  socialLinks Json?    @default("{}")
+  socialLinks Json?        @default("{}")
 
-  otps              OTP[]
+  otps                OTP[]
   passwordResetTokens PasswordResetToken[]
 
   // Document Management
@@ -45,115 +45,119 @@ model User {
   coverLetters CoverLetter[]
 
   // Social Feed
-  posts        Post[]
-  likes        Like[]
-  comments     Comment[]
+  posts    Post[]
+  likes    Like[]
+  comments Comment[]
 
   // Events
-  events                Event[]
-  eventRegistrations    EventRegistration[]
+  events             Event[]
+  eventRegistrations EventRegistration[]
 
   // Jobs
-  postedJobs            Job[]
-  jobApplications       JobApplication[]
+  postedJobs      Job[]
+  jobApplications JobApplication[]
 
   // Marketplace
-  marketplaceListings       MarketplaceListing[]
-  marketplaceApplications   MarketplaceApplication[]
+  marketplaceListings     MarketplaceListing[]
+  marketplaceApplications MarketplaceApplication[]
+
+  // Messages
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   @@map("users")
 }
 
 model Resume {
-  id          String   @id @default(uuid())
-  title       String
-  company     String?
-  template    String   @default("Modern")
-  content     Json?    // Snapshot of the resume data
-  isMagic     Boolean  @default(false)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  title     String
+  company   String?
+  template  String   @default("Modern")
+  content   Json? // Snapshot of the resume data
+  isMagic   Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  versions    ResumeVersion[]
+  versions ResumeVersion[]
 
   @@map("resumes")
 }
 
 model ResumeVersion {
-  id          String   @id @default(uuid())
-  company     String?
-  role        String
-  resumeId    String
-  resume      Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  status      String   @default("Active") // e.g., "Active", "Applied", "Draft"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  company   String?
+  role      String
+  resumeId  String
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  status    String   @default("Active") // e.g., "Active", "Applied", "Draft"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("resume_versions")
 }
 
 model CoverLetter {
-  id          String   @id @default(uuid())
-  title       String
-  company     String?
-  recipient   String?
-  content     String?   @db.Text
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  title     String
+  company   String?
+  recipient String?
+  content   String?  @db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("cover_letters")
 }
 
 model Skill {
-  id             String   @id @default(uuid())
+  id             String  @id @default(uuid())
   name           String
-  isGithubSynced Boolean  @default(false)
+  isGithubSynced Boolean @default(false)
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("skills")
 }
 
 model Experience {
-  id          String   @id @default(uuid())
+  id          String  @id @default(uuid())
   company     String
   position    String
   startDate   String
   endDate     String?
   description String?
-  isCurrent   Boolean  @default(false)
+  isCurrent   Boolean @default(false)
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("experiences")
 }
 
 model Education {
-  id             String   @id @default(uuid())
+  id             String  @id @default(uuid())
   institution    String
   degree         String
   field          String
   graduationDate String
   gpa            String?
-  graduationType String?  // e.g. "cgpa" or "percentage"
+  graduationType String? // e.g. "cgpa" or "percentage"
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("educations")
 }
 
 model Project {
-  id             String   @id @default(uuid())
+  id             String  @id @default(uuid())
   name           String
   techStack      String?
   description    String?
-  isGithubSynced Boolean  @default(false)
+  isGithubSynced Boolean @default(false)
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("projects")
 }
@@ -211,22 +215,22 @@ model Admin {
 }
 
 model Company {
-  id                   String                @id @default(uuid())
-  name                 String
-  description          String?               @db.Text
-  website              String?
-  industry             String?
-  logoUrl              String?               // ImageKit URL
-  logoFileId           String?               // ImageKit file ID for deletion
-  docUrl               String?               // Owner documentation ImageKit URL
-  docFileId            String?               // ImageKit file ID
+  id                    String                @id @default(uuid())
+  name                  String
+  description           String?               @db.Text
+  website               String?
+  industry              String?
+  logoUrl               String? // ImageKit URL
+  logoFileId            String? // ImageKit file ID for deletion
+  docUrl                String? // Owner documentation ImageKit URL
+  docFileId             String? // ImageKit file ID
   docVerificationStatus DocVerificationStatus @default(PENDING)
-  docRejectionReason   String?               @db.Text
-  userId               String                @unique
-  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobs                 Job[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  docRejectionReason    String?               @db.Text
+  userId                String                @unique
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs                  Job[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 
   @@map("companies")
 }
@@ -240,19 +244,19 @@ enum DocVerificationStatus {
 // Social Feed
 
 model Post {
-  id            String     @id @default(uuid())
-  type          PostType   @default(TEXT)
-  content       String?    @db.Text
+  id            String    @id @default(uuid())
+  type          PostType  @default(TEXT)
+  content       String?   @db.Text
   imageUrl      String?
   imageFileId   String?
   authorId      String
-  author        User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   likes         Like[]
   comments      Comment[]
-  isSponsored   Boolean    @default(false)
+  isSponsored   Boolean   @default(false)
   promotedUntil DateTime?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@index([authorId])
   @@map("posts")
@@ -292,43 +296,43 @@ enum PostType {
 // ─── Events ───────────────────────────────────────────────────────────────────
 
 model Event {
-  id                  String        @id @default(uuid())
-  title               String
-  description         String        @db.Text
-  bannerUrl           String?
-  bannerFileId        String?
-  price               Int           // in paise (INR). 0 = free
-  venue               String
-  prize               String?
-  maxParticipants     Int?
-  eventDate           DateTime
-  contactInfo         String
-  organizerName       String
-  status              EventStatus   @default(ACTIVE)
-  
+  id              String      @id @default(uuid())
+  title           String
+  description     String      @db.Text
+  bannerUrl       String?
+  bannerFileId    String?
+  price           Int // in paise (INR). 0 = free
+  venue           String
+  prize           String?
+  maxParticipants Int?
+  eventDate       DateTime
+  contactInfo     String
+  organizerName   String
+  status          EventStatus @default(ACTIVE)
+
   // Listing fee payment (₹100)
-  listingOrderId      String?
-  listingPaymentId    String?
-  isListed            Boolean       @default(false)  // true once listing fee paid
+  listingOrderId   String?
+  listingPaymentId String?
+  isListed         Boolean @default(false) // true once listing fee paid
 
-  organizerId         String
-  organizer           User          @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  organizerId String
+  organizer   User   @relation(fields: [organizerId], references: [id], onDelete: Cascade)
 
-  registrations       EventRegistration[]
+  registrations EventRegistration[]
 
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([organizerId])
   @@map("events")
 }
 
 model EventRegistration {
-  id              String                    @id @default(uuid())
-  eventId         String
-  event           Event                     @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  userId          String
-  user            User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Participant details (captured at registration)
   participantName  String
@@ -336,24 +340,24 @@ model EventRegistration {
   participantPhone String
 
   // Payment
-  amountPaid       Int                       // in paise
-  orderId          String?
-  paymentId        String?
-  paymentStatus    PaymentStatus             @default(PENDING)
+  amountPaid    Int // in paise
+  orderId       String?
+  paymentId     String?
+  paymentStatus PaymentStatus @default(PENDING)
 
   // Secret 5-digit attendance code — never exposed to host/admin
-  attendanceCode   String
+  attendanceCode String
 
   // Attendance verification
-  attendanceStatus AttendanceStatus          @default(NOT_VERIFIED)
+  attendanceStatus AttendanceStatus @default(NOT_VERIFIED)
   verifiedAt       DateTime?
 
   // Refund
-  refundStatus     RefundStatus              @default(NONE)
-  refundReason     String?
+  refundStatus RefundStatus @default(NONE)
+  refundReason String?
 
-  createdAt        DateTime                  @default(now())
-  updatedAt        DateTime                  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([eventId, userId])
   @@index([eventId])
@@ -387,26 +391,26 @@ enum RefundStatus {
 // ─── Jobs ──────────────────────────────────────────────────────────────────────
 
 model Job {
-  id               String           @id @default(uuid())
-  title            String
-  description      String           @db.Text
-  requirements     String?          @db.Text
-  location         String?
-  type             JobType          @default(FULL_TIME)
-  salary           String?          // e.g. "₹8-12 LPA"
-  experience       String?          // e.g. "2-4 years"
-  skills           String[]         // array of skill tags
-  status           JobStatus        @default(OPEN)
+  id           String    @id @default(uuid())
+  title        String
+  description  String    @db.Text
+  requirements String?   @db.Text
+  location     String?
+  type         JobType   @default(FULL_TIME)
+  salary       String? // e.g. "₹8-12 LPA"
+  experience   String? // e.g. "2-4 years"
+  skills       String[] // array of skill tags
+  status       JobStatus @default(OPEN)
 
-  companyId        String
-  company          Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  founderId        String
-  founder          User             @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  founderId String
+  founder   User    @relation(fields: [founderId], references: [id], onDelete: Cascade)
 
-  applications     JobApplication[]
+  applications JobApplication[]
 
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([companyId])
   @@index([founderId])
@@ -414,21 +418,21 @@ model Job {
 }
 
 model JobApplication {
-  id               String            @id @default(uuid())
-  jobId            String
-  job              Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  applicantId      String
-  applicant        User              @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  id          String @id @default(uuid())
+  jobId       String
+  job         Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User   @relation(fields: [applicantId], references: [id], onDelete: Cascade)
 
   // Application details
-  name             String
-  resumeUrl        String
-  note             String?           @db.Text
+  name      String
+  resumeUrl String
+  note      String? @db.Text
 
-  status           ApplicationStatus @default(PENDING)
+  status ApplicationStatus @default(PENDING)
 
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([jobId, applicantId])
   @@index([jobId])
@@ -454,43 +458,47 @@ enum ApplicationStatus {
   PENDING
   ACCEPTED
   REJECTED
+  WITHDRAWN
+  TERMINATED
 }
 
 // ─── Marketplace (Funding) ──────────────────────────────────────────────────
 
 model MarketplaceListing {
-  id                      String   @id @default(uuid())
-  title                   String
-  description             String   @db.Text
-  type                    ListingType // FUND_REQUEST (Founder) or FUND_OFFER (User)
-  amountText              String   // e.g. "₹50L - ₹1Cr"
-  promisesOrExpectations  String   @db.Text // What they offer / what they expect
-  status                  ListingStatus @default(OPEN)
+  id                     String        @id @default(uuid())
+  title                  String
+  description            String        @db.Text
+  type                   ListingType // FUND_REQUEST (Founder) or FUND_OFFER (User)
+  amountText             String // e.g. "₹50L - ₹1Cr"
+  promisesOrExpectations String        @db.Text // What they offer / what they expect
+  status                 ListingStatus @default(OPEN)
 
-  creatorId               String
-  creator                 User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  concernsCount Int @default(0)
 
-  applications            MarketplaceApplication[]
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  applications MarketplaceApplication[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([creatorId])
   @@map("marketplace_listings")
 }
 
 model MarketplaceApplication {
-  id          String   @id @default(uuid())
+  id          String             @id @default(uuid())
   listingId   String
   listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   applicantId String
-  applicant   User     @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  applicant   User               @relation(fields: [applicantId], references: [id], onDelete: Cascade)
 
-  note        String?  @db.Text // Pitch or message
-  status      ApplicationStatus @default(PENDING) // Reusing the same enum as Jobs
+  note   String?           @db.Text // Pitch or message
+  status ApplicationStatus @default(PENDING) // Reusing the same enum as Jobs
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([listingId, applicantId])
   @@index([listingId])
@@ -506,4 +514,29 @@ enum ListingType {
 enum ListingStatus {
   OPEN
   CLOSED
+}
+
+// ─── Messaging (Real-time chat) ────────────────────────────────────────────────
+
+model Message {
+  id      String  @id @default(uuid())
+  content String  @db.Text
+  isRead  Boolean @default(false)
+
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  // Useful for knowing which generic feature initiated a chat (e.g. from Job or Marketplace)
+  contextType String? // 'JOB_APPLICATION', 'MARKETPLACE'
+  contextId   String? // the specific ID
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("messages")
 }

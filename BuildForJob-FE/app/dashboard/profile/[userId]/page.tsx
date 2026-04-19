@@ -16,10 +16,10 @@ import { formatDistanceToNow } from "date-fns";
 export default function PublicProfilePage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
   const [profile, setProfile] = useState<any>(null);
-  const [posts, setPosts]     = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
-  const [tab, setTab]         = useState<"posts" | "about">("posts");
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<"posts" | "about">("posts");
 
   useEffect(() => {
     if (!userId) return;
@@ -33,8 +33,8 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           setPosts(
             (rawPosts ?? []).map((p: any) => ({
               ...p,
-              comments:    p.comments    ?? [],
-              _count:      p._count      ?? { likes: 0, comments: 0 },
+              comments: p.comments ?? [],
+              _count: p._count ?? { likes: 0, comments: 0 },
               isLikedByMe: p.isLikedByMe ?? false,
               isSponsored: p.isSponsored ?? false,
             }))
@@ -46,10 +46,10 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
   }, [userId]);
 
   /* ── optimistic post handlers ── */
-  const handleDelete        = (id: string)                         => setPosts(p => p.filter(x => x.id !== id));
-  const handleLikeToggle    = (id: string, liked: boolean, n: number) =>
+  const handleDelete = (id: string) => setPosts(p => p.filter(x => x.id !== id));
+  const handleLikeToggle = (id: string, liked: boolean, n: number) =>
     setPosts(p => p.map(x => x.id === id ? { ...x, isLikedByMe: liked, _count: { ...x._count, likes: n } } : x));
-  const handleCommentAdded  = (id: string, c: Comment) =>
+  const handleCommentAdded = (id: string, c: Comment) =>
     setPosts(p => p.map(x => x.id === id ? { ...x, comments: [...(x.comments ?? []), c], _count: { ...x._count, comments: (x._count?.comments ?? 0) + 1 } } : x));
   const handleCommentDeleted = (id: string, cid: string) =>
     setPosts(p => p.map(x => x.id === id ? { ...x, comments: (x.comments ?? []).filter(c => c.id !== cid), _count: { ...x._count, comments: Math.max(0, (x._count?.comments ?? 1) - 1) } } : x));
@@ -71,7 +71,7 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
     </div>
   );
 
-  const initials   = `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase();
+  const initials = `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase();
   const totalLikes = posts.reduce((s, p) => s + (p._count?.likes ?? 0), 0);
 
   return (
@@ -153,8 +153,8 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           {/* Stats */}
           <div className="flex items-center gap-6 mt-5 pt-4 border-t border-gray-100 dark:border-white/5">
             {[
-              { label: "Posts",    value: posts.length },
-              { label: "Likes",    value: totalLikes },
+              { label: "Posts", value: posts.length },
+              { label: "Likes", value: totalLikes },
             ].map(({ label, value }) => (
               <div key={label}>
                 <p className="text-lg font-bold text-gray-900 dark:text-white">{value}</p>
@@ -177,11 +177,10 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${
-              tab === t
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${tab === t
                 ? "bg-white dark:bg-white/10 text-purple-600 dark:text-purple-400 shadow-sm"
                 : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            }`}
+              }`}
           >
             {t === "posts" ? `Posts (${posts.length})` : "About"}
           </button>

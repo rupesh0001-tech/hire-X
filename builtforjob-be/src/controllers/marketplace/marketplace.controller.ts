@@ -1,6 +1,7 @@
 import { Response, NextFunction } from 'express';
 import prisma from '../../config/database/db';
 import { AuthRequest } from '../../middlewares/auth/jwt.middleware';
+import { MessageController } from '../message/message.controller';
 
 export class MarketplaceController {
   
@@ -23,6 +24,10 @@ export class MarketplaceController {
           },
           _count: {
             select: { applications: true }
+          },
+          applications: {
+            where: { applicantId: req.user!.userId },
+            select: { id: true }
           }
         }
       });
@@ -81,6 +86,7 @@ export class MarketplaceController {
   static async getMyListings(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const creatorId = req.user!.userId;
+      console.log('--- getMyListings called for ---', creatorId);
       const listings = await prisma.marketplaceListing.findMany({
         where: { creatorId },
         orderBy: { createdAt: 'desc' },
@@ -191,11 +197,97 @@ export class MarketplaceController {
         data: { status } // Types: 'ACCEPTED' | 'REJECTED'
       });
 
+      if (status === 'ACCEPTED') {
+        const titleSnippet = listing.title.length > 20 ? listing.title.substring(0,20)+'...' : listing.title;
+        await MessageController.injectSystemMessage(
+          creatorId, // The listing creator
+          application.applicantId, // The applicant
+          `Hi! I have accepted your interest in "${titleSnippet}". Let's discuss the terms further!`,
+          'MARKETPLACE',
+          listing.id
+        );
+      }
+
       return res.json({
         success: true,
         message: `Application ${status.toLowerCase()}`,
         data: application
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 7. Withdraw application (both can do it, terminates contract)
+  static async withdrawApplication(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId;
+      const { id: listingId, appId } = req.params;
+
+      const application = await prisma.marketplaceApplication.findUnique({
+        where: { id: appId },
+        include: { listing: true }
+      });
+
+      if (!application) return res.status(404).json({ success: false, message: 'Not found' });
+
+      // Ensure user is either applicant or creator
+      if (application.applicantId !== userId && application.listing.creatorId !== userId) {
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
+      }
+
+      await prisma.marketplaceApplication.update({
+        where: { id: appId },
+        data: { status: 'WITHDRAWN' }
+      });
+
+      return res.json({ success: true, message: 'Application withdrawn successfully' });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // 8. Report Middleman (involves terminating contract and adding concern to listing)
+  static async reportApplication(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId;
+      const { id: listingId, appId } = req.params;
+
+      const application = await prisma.marketplaceApplication.findUnique({
+        where: { id: appId },
+        include: { listing: true }
+      });
+
+      if (!application) return res.status(404).json({ success: false, message: 'Not found' });
+
+      // Either side can report
+      if (application.applicantId !== userId && application.listing.creatorId !== userId) {
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
+      }
+
+      if (application.status !== 'ACCEPTED') {
+        return res.status(400).json({ success: false, message: 'Only accepted connections can be reported' });
+      }
+
+      // 15 days window logic
+      const daysSinceAccepted = (new Date().getTime() - new Date(application.updatedAt).getTime()) / (1000 * 3600 * 24);
+      if (daysSinceAccepted > 15) {
+        return res.status(400).json({ success: false, message: 'Connections can only be reported within 15 days of acceptance' });
+      }
+
+      // Terminate connection
+      await prisma.marketplaceApplication.update({
+        where: { id: appId },
+        data: { status: 'TERMINATED' }
+      });
+
+      // Mark the listing as concerned
+      await prisma.marketplaceListing.update({
+        where: { id: application.listingId },
+        data: { concernsCount: { increment: 1 } }
+      });
+
+      return res.json({ success: true, message: 'Middleman reported successfully. Contract terminated.' });
     } catch (error) {
       next(error);
     }

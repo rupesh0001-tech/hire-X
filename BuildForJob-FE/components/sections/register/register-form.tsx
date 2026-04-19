@@ -30,6 +30,12 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Disabled temporarily: non-English characters in email credentials");
+      return;
+    }
+
     try {
       const resultAction = await dispatch(
         register({ email, password, firstName, lastName, role: isFounder ? "FOUNDER" : "USER" })

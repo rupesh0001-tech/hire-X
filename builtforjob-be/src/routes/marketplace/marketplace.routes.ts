@@ -11,5 +11,7 @@ router.get('/my-listings', authenticateJWT, MarketplaceController.getMyListings 
 router.get('/my-applications', authenticateJWT, MarketplaceController.getMyApplications as any);
 router.post('/:id/apply', authenticateJWT, MarketplaceController.applyForListing as any);
 router.patch('/:id/applications/:appId', authenticateJWT, MarketplaceController.updateApplicationStatus as any);
+router.patch('/:id/applications/:appId/withdraw', authenticateJWT, MarketplaceController.withdrawApplication as any);
+router.patch('/:id/applications/:appId/report', authenticateJWT, MarketplaceController.reportApplication as any);
 
 export { router as marketplaceRouter };

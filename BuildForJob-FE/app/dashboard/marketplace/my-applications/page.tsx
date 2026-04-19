@@ -24,6 +24,31 @@ export default function MyApplicationsPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const handleWithdraw = async (listingId: string, appId: string) => {
+    if (!confirm("Are you sure you want to withdraw and terminate this contract?")) return;
+    try {
+      const res = await marketplaceApi.withdrawApplication(listingId, appId);
+      if (res.success) {
+        setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: 'WITHDRAWN' } as any : a));
+      }
+    } catch(err:any) { alert(err.response?.data?.message || "Error"); }
+  };
+
+  const handleReport = async (listingId: string, appId: string) => {
+    if (!confirm("Are you sure you want to report this user? This will terminate the contract and flag the listing.")) return;
+    try {
+      const res = await marketplaceApi.reportApplication(listingId, appId);
+      if (res.success) {
+        setApplications(prev => prev.map(a => a.id === appId ? { ...a, status: 'TERMINATED' } as any : a));
+      }
+    } catch(err:any) { alert(err.response?.data?.message || "Error"); }
+  };
+
+  const isReportable = (updatedAt: string) => {
+    const days = (new Date().getTime() - new Date(updatedAt).getTime()) / (1000 * 3600 * 24);
+    return days <= 15;
+  };
+
   if (loading) {
     return <div className="flex justify-center py-32"><Loader2 className="animate-spin text-purple-500" /></div>;
   }
@@ -71,6 +96,8 @@ export default function MyApplicationsPage() {
                 <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide
                   ${app.status === 'ACCEPTED' ? 'bg-green-500/10 text-green-500' : 
                     app.status === 'REJECTED' ? 'bg-red-500/10 text-red-500' : 
+                    app.status === 'WITHDRAWN' ? 'bg-gray-500/10 text-gray-500' :
+                    app.status === 'TERMINATED' ? 'bg-red-900/10 text-red-700' :
                     'bg-amber-500/10 text-amber-500'}
                 `}>
                   {app.status === 'ACCEPTED' && <CheckCircle2 size={14} />}
@@ -78,6 +105,19 @@ export default function MyApplicationsPage() {
                   {app.status === 'PENDING' && <Clock size={14} />}
                   {app.status}
                 </div>
+                
+                {app.status === 'ACCEPTED' && (
+                  <div className="flex gap-2 mt-1">
+                    <button onClick={() => handleWithdraw(app.listingId, app.id)} className="text-[10px] uppercase font-bold text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2 py-1 rounded">
+                      Withdraw
+                    </button>
+                    {isReportable(app.updatedAt) && (
+                      <button onClick={() => handleReport(app.listingId, app.id)} className="text-[10px] uppercase font-bold text-red-500 hover:text-red-700 transition-colors bg-red-500/5 border border-red-500/20 px-2 py-1 rounded">
+                        Report Middleman
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}

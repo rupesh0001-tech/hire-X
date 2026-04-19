@@ -8,6 +8,7 @@ export interface MarketplaceListing {
   amountText: string;
   promisesOrExpectations: string;
   status: 'OPEN' | 'CLOSED';
+  concernsCount: number;
   creatorId: string;
   createdAt: string;
   creator: {
@@ -75,6 +76,16 @@ export const marketplaceApi = {
   // Accept or reject an application
   updateApplicationStatus: async (listingId: string, appId: string, status: 'ACCEPTED' | 'REJECTED'): Promise<{ success: boolean; data: any }> => {
     const res = await api.patch(`/marketplace/${listingId}/applications/${appId}`, { status });
+    return res.data;
+  },
+
+  withdrawApplication: async (listingId: string, appId: string): Promise<{ success: boolean }> => {
+    const res = await api.patch(`/marketplace/${listingId}/applications/${appId}/withdraw`);
+    return res.data;
+  },
+
+  reportApplication: async (listingId: string, appId: string): Promise<{ success: boolean }> => {
+    const res = await api.patch(`/marketplace/${listingId}/applications/${appId}/report`);
     return res.data;
   }
 };

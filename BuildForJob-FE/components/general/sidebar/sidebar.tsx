@@ -10,7 +10,7 @@ import { useAppSelector } from "@/store/hooks";
 import {
   LayoutDashboard, FilePlus, Files, History, Mail, Edit,
   Rss, PenSquare,
-  CalendarDays, Ticket, CalendarCheck, User,
+  CalendarDays, Ticket, CalendarCheck, User, Users,
   Briefcase, ClipboardList, Building2, Building, ListChecks,
 } from "lucide-react";
 
@@ -31,6 +31,7 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
     { name: "Feed",      href: "/dashboard/feed",      icon: Rss },
     { name: "My Posts",  href: "/dashboard/my-posts",  icon: PenSquare },
     { name: "Overview",  href: "/dashboard/overview",  icon: LayoutDashboard },
+    { name: "Connections", href: "/dashboard/connections", icon: Users },
   ];
 
   const baseTools = [

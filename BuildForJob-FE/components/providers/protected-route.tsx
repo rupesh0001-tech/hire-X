@@ -5,6 +5,8 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { fetchProfile } from "@/store/slices/authSlice";
 import { Loader2 } from "lucide-react";
 import React from "react";
+import { MessagingProvider } from "@/providers/messaging-provider";
+import { MessagesWidget } from "../general/messages/messages-widget";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, token } = useAppSelector((state) => state.auth);
@@ -43,5 +45,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <MessagingProvider>
+      {children}
+      <MessagesWidget />
+    </MessagingProvider>
+  );
 }

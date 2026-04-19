@@ -1,6 +1,7 @@
 import type { Response, NextFunction } from 'express';
 import prisma from '../../config/database/db';
 import type { AuthRequest } from '../../middlewares/auth/jwt.middleware';
+import { MessageController } from '../message/message.controller';
 
 export class JobController {
   // ── GET /job  — all OPEN jobs (any authenticated user)
@@ -264,6 +265,18 @@ export class JobController {
           applicant: { select: { id: true, firstName: true, lastName: true, email: true } },
         },
       });
+
+      if (status === 'ACCEPTED') {
+        const titleSnippet = job.title.length > 20 ? job.title.substring(0,20)+'...' : job.title;
+        await MessageController.injectSystemMessage(
+          userId, // founder ID
+          updated.applicant.id, // applicant ID
+          `Hello! Your application for "${titleSnippet}" has been accepted. Let's discuss the next steps!`,
+          'JOB_APPLICATION',
+          job.id
+        );
+      }
+
       return res.json({ success: true, message: `Application ${status.toLowerCase()}`, data: updated });
     } catch (error) {
       next(error);

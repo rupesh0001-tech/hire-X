@@ -8,18 +8,20 @@ import { OAuthButtons } from "@/components/sections/general/oauth-buttons";
 import { RegisterForm } from "@/components/sections/register/register-form";
 import { FaceRegisterStep } from "@/components/sections/face/FaceRegisterStep";
 import { CompanySetupStep } from "@/components/sections/company/CompanySetupStep";
+import { ProfilePhotoUploadStep } from "@/components/sections/photo/ProfilePhotoUploadStep";
 import { ScanFace, Building2, UserCheck } from "lucide-react";
 
-type Step = "form" | "company" | "face";
+type Step = "form" | "company" | "face" | "photo";
 
 // Step indicator
 function StepBadge({ step, current }: { step: Step; current: Step }) {
-  const steps: Step[] = ["form", "company", "face"];
-  const labels: Record<Step, string> = { form: "Account", company: "Company", face: "Face ID" };
+  const steps: Step[] = ["form", "company", "face", "photo"];
+  const labels: Record<Step, string> = { form: "Account", company: "Company", face: "Face ID", photo: "Profile Photo" };
   const icons: Record<Step, React.ReactNode> = {
     form: <UserCheck size={12} />,
     company: <Building2 size={12} />,
     face: <ScanFace size={12} />,
+    photo: <UserCheck size={12} />,
   };
 
   const idx = steps.indexOf(step);
@@ -53,18 +55,22 @@ export default function RegisterPage() {
   };
 
   const handleCompanyComplete = () => setStep("face");
-  const handleFaceComplete = () => router.push("/dashboard");
+  const handleFaceComplete = () => setStep("photo");
+  const handlePhotoComplete = () => router.push("/dashboard");
 
   const stepTitles: Record<Step, string> = {
     form: "Create an account",
     company: "Set up your company",
     face: "Setup Face Login",
+    photo: "Add Profile Photo",
   };
   const stepSubtitles: Record<Step, string> = {
     form: "Start building your next-gen career profile today.",
     company: "Tell us about your company so candidates can find you.",
     face: "Add your face so you can log in instantly — no password needed.",
+    photo: "Upload a photo that matches your face securely.",
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#08080a] flex items-center justify-center p-6 relative overflow-hidden">
@@ -114,6 +120,10 @@ export default function RegisterPage() {
 
           {step === "face" && (
             <FaceRegisterStep email={registeredEmail} onComplete={handleFaceComplete} />
+          )}
+
+          {step === "photo" && (
+            <ProfilePhotoUploadStep onComplete={handlePhotoComplete} />
           )}
         </div>
 
