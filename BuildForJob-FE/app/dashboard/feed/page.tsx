@@ -82,7 +82,7 @@ export default function FeedPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto pb-16 animation-fade-in">
+    <div className="max-w-3xl mx-auto pb-16 animation-fade-in">
       {/* Doc verification banner — only shows for unverified founders */}
       <DocVerificationBanner />
 

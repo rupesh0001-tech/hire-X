@@ -117,7 +117,8 @@ export function PostCard({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.96 }}
-      className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] shadow-sm overflow-hidden"
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+      className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] shadow-md shadow-gray-200/60 dark:shadow-black/30 hover:shadow-xl hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 transition-shadow duration-300 overflow-hidden"
     >
       {/* Header */}
       <div className="flex items-start justify-between p-5 pb-3">
@@ -173,7 +174,7 @@ export function PostCard({
       {/* Content */}
       <div className="px-5 pb-3">
         {post.content && (
-          <p className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
+          <p className="text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
             {post.content}
           </p>
         )}
