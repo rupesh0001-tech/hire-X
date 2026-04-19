@@ -11,13 +11,13 @@ export function HeroHeadline() {
       }}
       className="text-4xl md:text-6xl font-bold tracking-tight mb-6 leading-[1.1] text-black dark:text-white"
     >
-      Single platform for AI powered <br /> <WordRotate 
+      The Ultimate Platform for <br /> <WordRotate 
         className="text-transparent my-1 bg-clip-text bg-linear-to-r from-purple-500 to-blue-500 dark:from-purple-400 dark:to-emerald-200" 
-        words={["Resume Builder ", "Cover Letter Builder", "Portfolio Builder", "LinkedIn Profile Enhancer", "GitHub Portfolio Builder", "ATS Checker"]} 
+        words={["Career Growth", "Job Matchmaking", "Networking Events", "Founder Funding", "Expert Resumes", "Secure Face-Auth", "Marketplace"]} 
       />
       <br className="hidden md:block" />
       <span className="text bg-clip-text text-black dark:text-white">
-         faster with AI.
+         Built for the Future.
       </span>
     </motion.h1>
   );

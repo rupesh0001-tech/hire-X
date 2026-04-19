@@ -41,7 +41,7 @@ export function HeroSection() {
 
           <ScrollRevealParagraph 
             className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto"
-            paragraph="Stop getting rejected by ATS. Build unbeatable resumes, perfect cover letters, and stunning portfolios automatically from your GitHub profile."
+            paragraph="The all-in-one ecosystem for job seekers and founders. Discover elite opportunities, host professional events, secure funding, and build unbeatable AI-powered job applications."
           />
 
           <HeroCta />

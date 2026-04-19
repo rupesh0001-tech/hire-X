@@ -36,21 +36,6 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
 
   const baseTools = [
     {
-      title: "Resumes",
-      items: [
-        { name: "Resume Builder",   href: "/dashboard/resume-builder",      icon: FilePlus },
-        { name: "My Resumes",       href: "/dashboard/resumes",              icon: Files },
-        { name: "Resume Versions",  href: "/dashboard/resumes/versions",     icon: History },
-      ],
-    },
-    {
-      title: "Cover Letters",
-      items: [
-        { name: "My Cover Letters",     href: "/dashboard/cover-letter/all", icon: Mail },
-        { name: "Cover Letter Builder", href: "/dashboard/cover-letter",     icon: Edit },
-      ],
-    },
-    {
       title: "Events",
       items: [
         { name: "All Events",       href: "/dashboard/events",                  icon: CalendarDays },
@@ -65,7 +50,22 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
         { name: "My Listings",      href: "/dashboard/marketplace/my-listings",     icon: Files },
         { name: "My Applications",  href: "/dashboard/marketplace/my-applications", icon: ClipboardList },
       ]
-    }
+    },
+    {
+      title: "Resumes",
+      items: [
+        { name: "Resume Builder",   href: "/dashboard/resume-builder",      icon: FilePlus },
+        { name: "My Resumes",       href: "/dashboard/resumes",              icon: Files },
+        { name: "Resume Versions",  href: "/dashboard/resumes/versions",     icon: History },
+      ],
+    },
+    {
+      title: "Cover Letters",
+      items: [
+        { name: "My Cover Letters",     href: "/dashboard/cover-letter/all", icon: Mail },
+        { name: "Cover Letter Builder", href: "/dashboard/cover-letter",     icon: Edit },
+      ],
+    },
   ];
 
   // ── Role-specific Jobs section ──────────────────────────────
