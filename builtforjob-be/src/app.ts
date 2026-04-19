@@ -48,11 +48,15 @@ app.use(errorMiddleware as any);
 
 const PORT = process.env.PORT || 5000;
 
-const server = createServer(app);
-initializeSocket(server);
+// Export the app for Vercel
+export default app;
 
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Only start the server and WebSockets if not running on Vercel
+if (process.env.VERCEL !== '1') {
+  const server = createServer(app);
+  initializeSocket(server);
+  server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
-export default server;
