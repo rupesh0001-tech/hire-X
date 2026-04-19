@@ -12,6 +12,15 @@ export interface User {
   isVerified?: boolean;
   createdAt?: string;
 
+  // Company (for FOUNDER)
+  company?: {
+    id: string;
+    name: string;
+    logoUrl?: string;
+    industry?: string;
+    docVerificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  } | null;
+
   // Profile Builder Fields
   skills?: { id?: string; name: string; isGithubSynced?: boolean }[];
   experience?: {

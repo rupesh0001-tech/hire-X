@@ -116,4 +116,79 @@ export class CompanyController {
       next(error);
     }
   }
+
+  // GET /company  — list all VERIFIED companies (public safe fields only)
+  static async getAllCompanies(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const companies = await prisma.company.findMany({
+        where: { docVerificationStatus: 'VERIFIED' },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          website: true,
+          industry: true,
+          logoUrl: true,
+          createdAt: true,
+          // Public user info (no email)
+          user: {
+            select: { id: true, firstName: true, lastName: true, avatarUrl: true, jobTitle: true },
+          },
+          _count: { select: { jobs: true } },
+        },
+      });
+      return res.json({ success: true, data: companies });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // GET /company/:id  — single company with its OPEN jobs (public safe)
+  static async getCompanyById(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const company = await prisma.company.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          website: true,
+          industry: true,
+          logoUrl: true,
+          createdAt: true,
+          // User info
+          user: {
+            select: { id: true, firstName: true, lastName: true, avatarUrl: true, jobTitle: true },
+          },
+          // Only return OPEN jobs for public viewing
+          jobs: {
+            where: { status: 'OPEN' },
+            orderBy: { createdAt: 'desc' },
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              requirements: true,
+              location: true,
+              type: true,
+              salary: true,
+              experience: true,
+              skills: true,
+              createdAt: true,
+            }
+          }
+        },
+      });
+
+      if (!company) {
+        return res.status(404).json({ success: false, message: 'Company not found' });
+      }
+
+      return res.json({ success: true, data: company });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

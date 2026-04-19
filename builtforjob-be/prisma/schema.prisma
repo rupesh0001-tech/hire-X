@@ -53,6 +53,10 @@ model User {
   events                Event[]
   eventRegistrations    EventRegistration[]
 
+  // Jobs
+  postedJobs            Job[]
+  jobApplications       JobApplication[]
+
   @@map("users")
 }
 
@@ -216,6 +220,7 @@ model Company {
   docRejectionReason   String?               @db.Text
   userId               String                @unique
   user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobs                 Job[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 
@@ -373,4 +378,76 @@ enum RefundStatus {
   NONE
   PENDING
   PROCESSED
+}
+
+// ─── Jobs ──────────────────────────────────────────────────────────────────────
+
+model Job {
+  id               String           @id @default(uuid())
+  title            String
+  description      String           @db.Text
+  requirements     String?          @db.Text
+  location         String?
+  type             JobType          @default(FULL_TIME)
+  salary           String?          // e.g. "₹8-12 LPA"
+  experience       String?          // e.g. "2-4 years"
+  skills           String[]         // array of skill tags
+  status           JobStatus        @default(OPEN)
+
+  companyId        String
+  company          Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  founderId        String
+  founder          User             @relation(fields: [founderId], references: [id], onDelete: Cascade)
+
+  applications     JobApplication[]
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  @@index([companyId])
+  @@index([founderId])
+  @@map("jobs")
+}
+
+model JobApplication {
+  id               String            @id @default(uuid())
+  jobId            String
+  job              Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId      String
+  applicant        User              @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  // Application details
+  name             String
+  resumeUrl        String
+  note             String?           @db.Text
+
+  status           ApplicationStatus @default(PENDING)
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([jobId, applicantId])
+  @@index([jobId])
+  @@index([applicantId])
+  @@map("job_applications")
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+  REMOTE
+}
+
+enum JobStatus {
+  OPEN
+  CLOSED
+  DRAFT
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

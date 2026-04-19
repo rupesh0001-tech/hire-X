@@ -27,5 +27,7 @@ const uploadFields = upload.fields([
 // All routes require auth
 router.post('/', authenticateJWT, uploadFields, CompanyController.createOrUpdate as any);
 router.get('/me', authenticateJWT, CompanyController.getMyCompany as any);
+router.get('/', authenticateJWT, CompanyController.getAllCompanies as any);
+router.get('/:id', authenticateJWT, CompanyController.getCompanyById as any);
 
 export { router as companyRouter };

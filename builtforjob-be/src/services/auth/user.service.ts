@@ -16,6 +16,15 @@ export class UserService {
         experience: true,
         education: true,
         projects: true,
+        company: {
+          select: {
+            id: true,
+            name: true,
+            logoUrl: true,
+            industry: true,
+            docVerificationStatus: true,
+          },
+        },
       }
     });
   }
