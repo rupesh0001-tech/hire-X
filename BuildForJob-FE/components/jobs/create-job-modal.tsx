@@ -48,7 +48,7 @@ export function CreateJobModal({ onClose, onCreated }: CreateJobModalProps) {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await jobsApi.createJob({ ...form, skills });
+      const res = await jobsApi.createJob({ ...form, skills } as any);
       if (res.success) {
         onCreated(res.data);
       }

@@ -240,7 +240,7 @@ function DocCard({
       {company.docVerificationStatus !== "VERIFIED" && (
         <div className="px-5 pb-4 flex gap-3">
           <button
-            disabled={actioning !== null || company.docVerificationStatus === "VERIFIED"}
+            disabled={actioning !== null}
             onClick={() => {
               setActioning("verify");
               onVerify(company.id);

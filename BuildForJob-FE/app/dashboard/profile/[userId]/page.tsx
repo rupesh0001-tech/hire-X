@@ -89,21 +89,18 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] overflow-hidden mb-4 shadow-sm"
+        className="mb-6"
       >
-        {/* Banner */}
-        <div className="h-24 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600" />
-
-        <div className="px-6 pb-6">
+        <div className="px-6 py-6 ring-1 ring-gray-200 dark:ring-white/10 bg-white dark:bg-white/[0.03] rounded-2xl shadow-sm">
           {/* Avatar row */}
-          <div className="flex items-end justify-between -mt-10 mb-4">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-purple-500/20 overflow-hidden border-4 border-white dark:border-[#08080a]">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-3xl shadow-xl shadow-purple-500/20 overflow-hidden border-4 border-white dark:border-[#111116]">
               {profile.avatarUrl
                 ? <img src={profile.avatarUrl} alt={initials} className="w-full h-full object-cover" />
                 : initials}
             </div>
 
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2">
               {profile.isVerified && (
                 <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400">
                   <ShieldCheck size={12} /> Verified
@@ -118,8 +115,13 @@ export default function PublicProfilePage({ params }: { params: Promise<{ userId
           </div>
 
           {/* Name + meta */}
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             {profile.firstName} {profile.lastName}
+            {profile.shortId && (
+              <span className="text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/5 select-all">
+                #{profile.shortId}
+              </span>
+            )}
           </h1>
           {profile.jobTitle && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{profile.jobTitle}</p>

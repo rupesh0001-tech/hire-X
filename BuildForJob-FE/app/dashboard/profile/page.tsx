@@ -101,44 +101,47 @@ export default function MyProfilePage() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.03] overflow-hidden mb-4 shadow-sm"
+        className="mb-6"
       >
-        {/* Banner */}
-        <div className="h-24 bg-gray-100 dark:bg-[#111116] border-b border-gray-200 dark:border-white/5 relative">
-          <Link
-            href="/dashboard/settings/profile"
-            className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white dark:bg-white/10 hover:bg-gray-50 dark:hover:bg-white/20 text-gray-800 dark:text-white border border-gray-200 dark:border-white/10 rounded-xl transition-all shadow-sm"
-          >
-            <Edit3 size={12} /> Edit Profile
-          </Link>
-        </div>
-
-        <div className="px-6 pb-6">
+        <div className="px-6 py-6 ring-1 ring-gray-200 dark:ring-white/10 bg-white dark:bg-white/[0.03] rounded-2xl shadow-sm">
           {/* Avatar row */}
-          <div className="flex items-end justify-between -mt-10 mb-4">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-2xl shadow-xl shadow-purple-500/20 overflow-hidden border-4 border-white dark:border-[#08080a]">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-3xl shadow-xl shadow-purple-500/20 overflow-hidden border-4 border-white dark:border-[#111116]">
               {(user as any).avatarUrl
                 ? <img src={(user as any).avatarUrl} alt={initials} className="w-full h-full object-cover" />
                 : initials}
             </div>
 
-            <div className="flex items-center gap-2 mb-1">
-              {user.isVerified && (
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200 dark:border-green-500/20">
-                  <ShieldCheck size={12} /> Verified
-                </span>
-              )}
-              {(user as any).role === "FOUNDER" && (
-                <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
-                  <Crown size={12} /> Founder
-                </span>
-              )}
+            <div className="flex flex-col items-end gap-3">
+              <Link
+                href="/dashboard/settings/profile"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold bg-white dark:bg-white/5 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-800 dark:text-white border border-gray-200 dark:border-white/10 rounded-xl transition-all shadow-sm"
+              >
+                <Edit3 size={14} /> Edit Profile
+              </Link>
+              <div className="flex items-center gap-2">
+                {user.isVerified && (
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200 dark:border-green-500/20">
+                    <ShieldCheck size={12} /> Verified
+                  </span>
+                )}
+                {(user as any).role === "FOUNDER" && (
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                    <Crown size={12} /> Founder
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Name + meta */}
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             {user.firstName} {user.lastName}
+            {(user as any).shortId && (
+              <span className="text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-gray-200 dark:border-white/5 select-all">
+                #{ (user as any).shortId }
+              </span>
+            )}
           </h1>
           {(user as any).jobTitle && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{(user as any).jobTitle}</p>

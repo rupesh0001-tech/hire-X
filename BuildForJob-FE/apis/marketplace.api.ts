@@ -30,8 +30,9 @@ export interface MarketplaceApplication {
   listingId: string;
   applicantId: string;
   note?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'TERMINATED';
   createdAt: string;
+  updatedAt: string;
   applicant: {
     id: string;
     firstName: string;

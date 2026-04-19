@@ -8,8 +8,9 @@ export interface User {
   location?: string;
   avatarUrl?: string;
   jobTitle?: string;
-  role?: 'USER' | 'FOUNDER';
+   role?: 'USER' | 'FOUNDER';
   isVerified?: boolean;
+  shortId?: string;
   createdAt?: string;
 
   // Company (for FOUNDER)

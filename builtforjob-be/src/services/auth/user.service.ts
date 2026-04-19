@@ -137,4 +137,78 @@ export class UserService {
       }
     });
   }
+  static async getAllUsers(limit = 20) {
+    return prisma.user.findMany({
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        company: {
+          select: { name: true, logoUrl: true }
+        }
+      }
+    });
+  }
+
+  static async searchUsersAndCompanies(query: string) {
+    // Strip '#' prefix and trim
+    let cleanQuery = query.trim();
+    if (cleanQuery.startsWith('#')) cleanQuery = cleanQuery.slice(1);
+    
+    if (!cleanQuery) return { users: [], companies: [] };
+
+    const [users, companies] = await Promise.all([
+      prisma.user.findMany({
+        where: {
+          OR: [
+            { id: { equals: cleanQuery.length === 36 ? cleanQuery : undefined, mode: 'insensitive' } },
+            { firstName: { contains: cleanQuery, mode: 'insensitive' } },
+            { lastName: { contains: cleanQuery, mode: 'insensitive' } },
+            { shortId: { contains: cleanQuery, mode: 'insensitive' } },
+            { email: { contains: cleanQuery, mode: 'insensitive' } },
+            { jobTitle: { contains: cleanQuery, mode: 'insensitive' } },
+            { bio: { contains: cleanQuery, mode: 'insensitive' } },
+            { location: { contains: cleanQuery, mode: 'insensitive' } },
+            // Search by full name combo
+            {
+              AND: [
+                { firstName: { contains: cleanQuery.split(' ')[0], mode: 'insensitive' } },
+                { lastName: { contains: cleanQuery.split(' ')[1] || '', mode: 'insensitive' } }
+              ]
+            }
+          ],
+        },
+        take: 10,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          avatarUrl: true,
+          role: true,
+          shortId: true,
+          jobTitle: true,
+          email: true,
+        },
+      }),
+      prisma.company.findMany({
+        where: {
+          OR: [
+            { name: { contains: cleanQuery, mode: 'insensitive' } },
+            { industry: { contains: cleanQuery, mode: 'insensitive' } },
+            { description: { contains: cleanQuery, mode: 'insensitive' } },
+            { website: { contains: cleanQuery, mode: 'insensitive' } },
+          ],
+        },
+        take: 5,
+        select: {
+          id: true,
+          name: true,
+          logoUrl: true,
+          industry: true,
+        },
+      }),
+    ]);
+
+    // De-duplicate results if same user found via multiple conditions (Prisma handles OR de-duplication mostly, but good to be safe)
+    return { users, companies };
+  }
 }

@@ -11,7 +11,9 @@ router.post('/login', validate(loginSchema), UserController.login);
 router.post('/forget/password', validate(forgotPasswordSchema), UserController.forgotPassword);
 router.get('/profile', authenticateJWT, UserController.getProfile as any);
 router.get('/profile/:id', authenticateJWT, UserController.getPublicProfile as any);
+router.get('/search', authenticateJWT, UserController.universalSearch as any);
 router.get('/search/:shortId', authenticateJWT, UserController.searchUserByShortId as any);
+router.get('/all', authenticateJWT, UserController.listUsers as any);
 router.patch('/profile', authenticateJWT, UserController.updateProfile as any);
 
 export { router as userRouter };

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Menu, X, Plus } from "lucide-react";
+import { Sun, Moon, Menu, X, Plus, Search, Building, User, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
@@ -19,8 +19,43 @@ export function DashboardHeader({ isSidebarOpen, setIsSidebarOpen }: DashboardHe
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showCreatePost, setShowCreatePost] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchResults, setSearchResults] = useState<{ users: any[], companies: any[] }>({ users: [], companies: [] });
+  const [isSearching, setIsSearching] = useState(false);
 
   const { user } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
+  // Debounced search
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const trimmedQuery = searchQuery.trim();
+      // Trigger search if 2+ chars OR 1+ char if starting with #
+      if (trimmedQuery.length < 2 && !trimmedQuery.startsWith('#')) {
+        setSearchResults({ users: [], companies: [] });
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const token = localStorage.getItem('token');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        const res = await fetch(`${apiUrl}/user/search?q=${encodeURIComponent(trimmedQuery)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSearchResults(data.data);
+        }
+      } catch (err) {
+        console.error("Search failed", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     setMounted(true);
@@ -59,6 +94,89 @@ export function DashboardHeader({ isSidebarOpen, setIsSidebarOpen }: DashboardHe
           <div className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
             {isSidebarOpen ? "Dashboard" : "BuildForJob"}
           </div>
+        </div>
+
+        {/* Universal Search Bar */}
+        <div className="hidden md:flex flex-1 max-w-lg mx-8 relative group">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            {isSearching ? <Loader2 size={16} className="text-purple-500 animate-spin" /> : <Search size={16} className={cn("transition-colors", isSearchFocused ? "text-purple-500" : "text-gray-400")} />}
+          </div>
+          <input
+            type="text"
+            placeholder="Search users, companies, roles..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
+            className="w-full bg-black/5 dark:bg-white/5 border border-transparent focus:border-purple-500/50 focus:bg-white dark:focus:bg-black rounded-xl py-2 pl-10 pr-4 text-sm transition-all outline-none"
+          />
+
+          <AnimatePresence>
+            {isSearchFocused && (searchQuery.length >= 2 || isSearching) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-[#111116] border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-[400px] overflow-y-auto z-50 p-2"
+              >
+                {/* Users Section */}
+                {searchResults.users.length > 0 && (
+                  <div className="mb-2">
+                    <p className="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider">Users</p>
+                    {searchResults.users.map((u) => (
+                      <button
+                        key={u.id}
+                        onClick={() => router.push(`/dashboard/profile/${u.id}`)}
+                        className="w-full flex items-center gap-3 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors group text-left"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center overflow-hidden shrink-0">
+                          {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" /> : <User size={18} className="text-purple-600 dark:text-purple-400" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                            {u.firstName} {u.lastName}
+                          </p>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                            {u.jobTitle || u.role} {u.shortId && `• #${u.shortId}`}
+                          </p>
+                        </div>
+                        <ArrowRight size={14} className="text-gray-300 dark:text-gray-700 opacity-0 group-hover:opacity-100 transition-all mr-2" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Companies Section */}
+                {searchResults.companies.length > 0 && (
+                  <div>
+                    <p className="px-3 py-1.5 text-[10px] uppercase font-bold text-gray-400 tracking-wider">Companies</p>
+                    {searchResults.companies.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => router.push(`/dashboard/companies/${c.id}`)}
+                        className="w-full flex items-center gap-3 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-colors group text-left"
+                      >
+                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center overflow-hidden shrink-0">
+                          {c.logoUrl ? <img src={c.logoUrl} className="w-full h-full object-cover" /> : <Building size={18} className="text-blue-600 dark:text-blue-400" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{c.name}</p>
+                          <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{c.industry || "Company"}</p>
+                        </div>
+                        <ArrowRight size={14} className="text-gray-300 dark:text-gray-700 opacity-0 group-hover:opacity-100 transition-all mr-2" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {!isSearching && searchResults.users.length === 0 && searchResults.companies.length === 0 && searchQuery.length >= 2 && (
+                  <div className="p-8 text-center">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">No matches found for "{searchQuery}"</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div className="flex items-center gap-3">

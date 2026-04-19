@@ -170,6 +170,7 @@ export class UserController {
           location: true,
           role: true,
           isVerified: true,
+          shortId: true,
           createdAt: true,
           company: {
             select: { name: true, description: true, website: true, industry: true, logoUrl: true }
@@ -232,6 +233,28 @@ export class UserController {
       const user = await UserService.findByShortId(shortId);
       if (!user) return res.status(404).json({ success: false, message: 'User not found' });
       return res.json({ success: true, data: user });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async listUsers(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const users = await UserService.getAllUsers(20);
+      return res.json({ success: true, data: users });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async universalSearch(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.json({ success: true, data: { users: [], companies: [] } });
+      }
+      const results = await UserService.searchUsersAndCompanies(q);
+      return res.json({ success: true, data: results });
     } catch (error) {
       next(error);
     }
