@@ -1,11 +1,9 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "src/app.ts",
-      "use": "@vercel/node"
+  "functions": {
+    "src/app.ts": {
+      "includeFiles": "prisma/**"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
