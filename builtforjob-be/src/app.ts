@@ -9,6 +9,7 @@ import { paymentRouter } from './routes/payment/payment.routes';
 import { adminRouter } from './routes/admin/admin.routes';
 import { eventRouter } from './routes/event/event.routes';
 import { jobRouter } from './routes/job/job.routes';
+import { marketplaceRouter } from './routes/marketplace/marketplace.routes';
 import { errorMiddleware } from './middlewares/error/error.middleware';
 
 const app = express();
@@ -31,6 +32,7 @@ app.use('/payment', paymentRouter);
 app.use('/admin', adminRouter);
 app.use('/event', eventRouter);
 app.use('/job', jobRouter);
+app.use('/marketplace', marketplaceRouter);
 
 // Root
 app.get('/', (req, res) => {

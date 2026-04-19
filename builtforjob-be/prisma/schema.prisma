@@ -57,6 +57,10 @@ model User {
   postedJobs            Job[]
   jobApplications       JobApplication[]
 
+  // Marketplace
+  marketplaceListings       MarketplaceListing[]
+  marketplaceApplications   MarketplaceApplication[]
+
   @@map("users")
 }
 
@@ -450,4 +454,56 @@ enum ApplicationStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+// ─── Marketplace (Funding) ──────────────────────────────────────────────────
+
+model MarketplaceListing {
+  id                      String   @id @default(uuid())
+  title                   String
+  description             String   @db.Text
+  type                    ListingType // FUND_REQUEST (Founder) or FUND_OFFER (User)
+  amountText              String   // e.g. "₹50L - ₹1Cr"
+  promisesOrExpectations  String   @db.Text // What they offer / what they expect
+  status                  ListingStatus @default(OPEN)
+
+  creatorId               String
+  creator                 User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  applications            MarketplaceApplication[]
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@index([creatorId])
+  @@map("marketplace_listings")
+}
+
+model MarketplaceApplication {
+  id          String   @id @default(uuid())
+  listingId   String
+  listing     MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User     @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+
+  note        String?  @db.Text // Pitch or message
+  status      ApplicationStatus @default(PENDING) // Reusing the same enum as Jobs
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([listingId, applicantId])
+  @@index([listingId])
+  @@index([applicantId])
+  @@map("marketplace_applications")
+}
+
+enum ListingType {
+  FUND_REQUEST
+  FUND_OFFER
+}
+
+enum ListingStatus {
+  OPEN
+  CLOSED
 }

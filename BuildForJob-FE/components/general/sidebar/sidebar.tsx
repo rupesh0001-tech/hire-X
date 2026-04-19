@@ -57,6 +57,14 @@ export function Sidebar({ isOpen, onClose, isOverlay }: SidebarProps) {
         { name: "My Events (Host)", href: "/dashboard/events/my-events",        icon: CalendarCheck },
       ],
     },
+    {
+      title: "Marketplace",
+      items: [
+        { name: "Browse Listings",  href: "/dashboard/marketplace",                 icon: Briefcase }, // Reused Briefcase for simplicity or Banknotes (Store)
+        { name: "My Listings",      href: "/dashboard/marketplace/my-listings",     icon: Files },
+        { name: "My Applications",  href: "/dashboard/marketplace/my-applications", icon: ClipboardList },
+      ]
+    }
   ];
 
   // ── Role-specific Jobs section ──────────────────────────────
